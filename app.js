@@ -38,7 +38,8 @@ app.use(
             ttl: 14 * 24 * 60 * 60, // 14 days
         }),
         cookie: {
-            secure: isProduction,
+            // Only use Secure on HTTPS; on http://localhost the browser won't send the cookie otherwise
+            secure: isProduction && process.env.USE_HTTPS !== "false",
             httpOnly: true,
             maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
             sameSite: "lax",
