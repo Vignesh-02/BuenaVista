@@ -7,16 +7,10 @@ const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const User = require("./models/user");
 // const seedDB = require("./seeds");
-
+const connectDB = require("./db");
 require('dotenv').config();
 
 const app = express();
-
-// Database connection (Mongoose 8+ no longer needs useNewUrlParser/useUnifiedTopology)
-const url = process.env.MONGODB_URL;
-mongoose.connect(url)
-    .then(() => console.log("Connected to MongoDB"))
-    .catch(err => console.error("MongoDB connection error:", err));
 
 // App configuration
 app.use(express.urlencoded({ extended: true }));
@@ -50,8 +44,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Seed database (uncomment if needed)
-// seedDB();
 
 // Routes
 const commentRoutes = require("./routes/comments");
@@ -63,7 +55,13 @@ app.use("/locations", locationRoutes);
 app.use("/locations/:id/comments", commentRoutes);
 
 // Start server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`BuenaVista server running on port ${port}`);
-});
+const port = process.env.PORT || 5000;
+
+
+(async () => {
+    await connectDB();
+  
+    app.listen(port, () => {
+        console.log(`BuenaVista server running on port ${port}`);
+    });
+  })();
