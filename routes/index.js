@@ -14,12 +14,16 @@ router.get("/register", (req, res) => {
 });
 
 // Handle user sign up
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
     try {
         const newUser = new User({ username: req.body.username });
         const user = await User.register(newUser, req.body.password);
-        
-        passport.authenticate("local")(req, res, () => {
+
+        req.login(user, (err) => {
+            if (err) {
+                req.flash("error", err.message);
+                return res.redirect("/register");
+            }
             req.flash("success", "Welcome to BuenaVista, " + user.username + "!");
             res.redirect("/locations");
         });
