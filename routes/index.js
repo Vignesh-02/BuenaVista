@@ -55,16 +55,15 @@ router.post("/login", passport.authenticate("local", {
     });
 });
 
-// Logout route
+// Logout route - destroy session in MongoStore and clear cookie
 router.get("/logout", (req, res, next) => {
     req.logout((err) => {
         if (err) {
             return next(err);
         }
-        req.flash("success", "You have been logged out!");
-        req.session.save((saveErr) => {
-            if (saveErr) return next(saveErr);
-            res.redirect("/locations");
+        req.session.destroy((destroyErr) => {
+            if (destroyErr) return next(destroyErr);
+            res.redirect("/locations?logged_out=1");
         });
     });
 });

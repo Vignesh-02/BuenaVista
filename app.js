@@ -74,6 +74,9 @@ app.use((req, res, next) => {
         res.locals.error = [];
         res.locals.success = [];
     }
+    if (req.query.logged_out) {
+        res.locals.success = ["You have been logged out!"];
+    }
     next();
 });
 
