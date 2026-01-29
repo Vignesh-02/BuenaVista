@@ -61,11 +61,19 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Middleware to pass currentUser and flash messages to all templates
+// Middleware to pass currentUser and flash messages to all templates.
+// Only read flash (which modifies the session) when the session has user or flash data.
+// Otherwise we'd mark new empty sessions as modified and save them to MongoDB.
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
-    res.locals.error = req.flash("error");
-    res.locals.success = req.flash("success");
+    const hasSessionData = req.session.passport || (req.session.flash && Object.keys(req.session.flash).length > 0);
+    if (hasSessionData) {
+        res.locals.error = req.flash("error");
+        res.locals.success = req.flash("success");
+    } else {
+        res.locals.error = [];
+        res.locals.success = [];
+    }
     next();
 });
 
