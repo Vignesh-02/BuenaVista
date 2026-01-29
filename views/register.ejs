@@ -1,0 +1,69 @@
+<%- include("partials/header"); %>
+
+<div class="container" style="max-width: 1200px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="form-custom">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);">
+                        <i class="bi bi-person-plus-fill text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    <h2 class="page-title mb-2">Create Account</h2>
+                    <p class="text-muted">Join our community of explorers</p>
+                </div>
+                
+                <form action="/register" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person me-1"></i>Username
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-lg" 
+                            id="username" 
+                            name="username" 
+                            placeholder="Choose a username"
+                            required
+                            autofocus
+                        >
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock me-1"></i>Password
+                        </label>
+                        <input 
+                            type="password" 
+                            class="form-control form-control-lg" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Create a secure password"
+                            required
+                        >
+                        <div class="form-text">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Use at least 8 characters
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-camp-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        Already have an account? 
+                        <a href="/login" class="fw-semibold" style="color: var(--color-primary);">
+                            Sign in here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("partials/footer"); %>
