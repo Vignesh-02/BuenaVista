@@ -12,9 +12,16 @@ require("dotenv").config();
 
 const app = express();
 
+// Trust proxy in production so req.secure and req.protocol reflect the original HTTPS request.
+// Use "true" so all proxy hops are trusted (some hosts use multiple proxies).
+if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", true);
+}
+
 // App configuration
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
+// Serve static files BEFORE session so /public requests don't create new sessions
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 app.use(flash());
