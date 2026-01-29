@@ -25,7 +25,11 @@ router.post("/register", async (req, res, next) => {
                 return res.redirect("/register");
             }
             req.flash("success", "Welcome to BuenaVista, " + user.username + "!");
-            res.redirect("/locations");
+            // Save session to MongoStore before redirect so passport data is persisted
+            req.session.save((saveErr) => {
+                if (saveErr) return next(saveErr);
+                res.redirect("/locations");
+            });
         });
     } catch (err) {
         console.log(err);
@@ -43,9 +47,12 @@ router.get("/login", (req, res) => {
 router.post("/login", passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: { type: "error", message: "Invalid username or password" }
-}), (req, res) => {
+}), (req, res, next) => {
     req.flash("success", "Welcome back, " + req.user.username + "!");
-    res.redirect("/locations");
+    req.session.save((err) => {
+        if (err) return next(err);
+        res.redirect("/locations");
+    });
 });
 
 // Logout route
@@ -55,7 +62,10 @@ router.get("/logout", (req, res, next) => {
             return next(err);
         }
         req.flash("success", "You have been logged out!");
-        res.redirect("/locations");
+        req.session.save((saveErr) => {
+            if (saveErr) return next(saveErr);
+            res.redirect("/locations");
+        });
     });
 });
 
