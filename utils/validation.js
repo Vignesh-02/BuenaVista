@@ -61,9 +61,24 @@ function validateLogin(username, password) {
     return { valid: true };
 }
 
+function mapRegisterError(err) {
+    if (err.code === 11000) {
+        return "That username is already taken. Please choose another.";
+    }
+    if (err.name === "ValidationError") {
+        const msg = err.errors?.username?.message || err.message;
+        return msg;
+    }
+    if (err.message && err.message.includes("UserExistsError")) {
+        return "That username is already taken. Please choose another.";
+    }
+    return err.message || "Something went wrong. Please try again.";
+}
+
 module.exports = {
     validateRegister,
     validateLogin,
+    mapRegisterError,
     USERNAME_MIN,
     USERNAME_MAX,
     PASSWORD_MIN,
