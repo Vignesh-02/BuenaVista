@@ -2,22 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const User = require("../models/user");
-const { validateRegister, validateLogin } = require("../utils/validation");
-
-// Map mongoose/passport errors to user-friendly messages
-function mapRegisterError(err) {
-    if (err.code === 11000) {
-        return "That username is already taken. Please choose another.";
-    }
-    if (err.name === "ValidationError") {
-        const msg = err.errors?.username?.message || err.message;
-        return msg;
-    }
-    if (err.message && err.message.includes("UserExistsError")) {
-        return "That username is already taken. Please choose another.";
-    }
-    return err.message || "Something went wrong. Please try again.";
-}
+const { validateRegister, validateLogin, mapRegisterError } = require("../utils/validation");
 
 // Root route
 router.get("/", (req, res) => {

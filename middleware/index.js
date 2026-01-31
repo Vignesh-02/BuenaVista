@@ -26,7 +26,7 @@ middlewareObj.checkLocationOwnership = async (req, res, next) => {
         }
     } else {
         req.flash("error", "You need to be logged in to do that");
-        res.redirect("back");
+        res.redirect("/login");
     }
 };
 
@@ -52,7 +52,7 @@ middlewareObj.checkCommentOwnership = async (req, res, next) => {
         }
     } else {
         req.flash("error", "You need to be logged in to do that");
-        res.redirect("back");
+        res.redirect("/login");
     }
 };
 

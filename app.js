@@ -9,6 +9,10 @@ const User = require("./models/user");
 // const seedDB = require("./seeds");
 const connectDB = require("./db");
 require("dotenv").config();
+// In test, always use in-memory MongoDB. Restore MONGODB_URL after .env so tests never hit production.
+if (process.env.NODE_ENV === "test" && global.TEST_MONGODB_URI) {
+    process.env.MONGODB_URL = global.TEST_MONGODB_URI;
+}
 
 const app = express();
 
@@ -89,13 +93,15 @@ app.use("/", indexRoutes);
 app.use("/locations", locationRoutes);
 app.use("/locations/:id/comments", commentRoutes);
 
-// Start server
+// Start server only when run directly (not when required by tests)
 const port = process.env.PORT || 5000;
+if (require.main === module) {
+    (async () => {
+        await connectDB();
+        app.listen(port, () => {
+            console.log(`BuenaVista server running on port ${port}`);
+        });
+    })();
+}
 
-(async () => {
-    await connectDB();
-
-    app.listen(port, () => {
-        console.log(`BuenaVista server running on port ${port}`);
-    });
-})();
+module.exports = { app };
