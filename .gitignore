@@ -7,9 +7,15 @@ node_modules/
 .env.*.local
 .env.production
 
-# Test and coverage
+# Test and coverage (Jest)
 coverage/
 .nyc_output/
+
+# Playwright E2E
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/
 
 # Logs
 logs/

@@ -8,10 +8,10 @@ const session = require("express-session");
 const User = require("./models/user");
 // const seedDB = require("./seeds");
 const connectDB = require("./db");
-require("dotenv").config();
-// In test, always use in-memory MongoDB. Restore MONGODB_URL after .env so tests never hit production.
-if (process.env.NODE_ENV === "test" && global.TEST_MONGODB_URI) {
-    process.env.MONGODB_URL = global.TEST_MONGODB_URI;
+if (process.env.NODE_ENV !== "test") require("dotenv").config();
+// In test, MONGODB_URL is set by E2E server (spawn env) or Jest global; never load .env in test.
+if (process.env.NODE_ENV === "test") {
+    process.env.MONGODB_URL = process.env.MONGODB_URL || global.TEST_MONGODB_URI;
 }
 
 const app = express();
@@ -94,7 +94,7 @@ app.use("/locations", locationRoutes);
 app.use("/locations/:id/comments", commentRoutes);
 
 // Start server only when run directly (not when required by tests)
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5004;
 if (require.main === module) {
     (async () => {
         await connectDB();
