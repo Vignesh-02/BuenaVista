@@ -17,6 +17,18 @@ const campgroundSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment"
         }
+    ],
+    // Simple reactions: like counter plus list of users who liked this location
+    likes: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    likedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
     ]
 }, {
     timestamps: true  // Automatically adds createdAt and updatedAt fields
