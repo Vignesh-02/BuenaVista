@@ -30,16 +30,60 @@
                 <% } %>
             </div>
             
-            <!-- Translate All Button -->
-            <button 
-                class="btn-translate-all" 
-                onclick="translateAll()"
-                data-translated="false"
-                title="Translate all content to English"
-            >
-                <i class="bi bi-translate"></i>
-                <span class="translate-text">Translate to English</span>
-            </button>
+            <div class="d-flex flex-column align-items-end gap-2">
+                <!-- Like & Share actions -->
+                <div class="d-flex gap-2">
+                    <%
+                        var userLiked = currentUser && location.likedBy && location.likedBy.some(function(id) { return id.toString() === currentUser._id.toString(); });
+                        var likeCount = typeof location.likes === "number" ? location.likes : 0;
+                    %>
+                    <button 
+                        type="button"
+                        id="like-btn"
+                        class="btn btn-light btn-sm d-inline-flex align-items-center gap-2"
+                        title="Like this location"
+                        data-location-id="<%= location._id %>"
+                        data-liked="<%= userLiked ? 'true' : 'false' %>"
+                        <% if(!currentUser) { %>disabled<% } %>
+                    >
+                        <i class="bi <%= userLiked ? 'bi-heart-fill' : 'bi-heart' %> like-icon" style="color: #e63946;"></i>
+                        <span class="like-count"><%= likeCount %></span>
+                    </button>
+                    <div class="dropdown d-inline-block" data-location-id="<%= location._id %>" data-location-name="<%= location.name %>">
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2 dropdown-toggle"
+                            id="shareDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            title="Share this location"
+                        >
+                            <i class="bi bi-share-fill"></i>
+                            <span>Share</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end share-dropdown" aria-labelledby="shareDropdown">
+                            <li><a class="dropdown-item share-option" href="#" data-share="gmail"><i class="bi bi-envelope me-2"></i>Gmail</a></li>
+                            <li><a class="dropdown-item share-option" href="#" data-share="whatsapp"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a></li>
+                            <li><a class="dropdown-item share-option" href="#" data-share="twitter"><i class="bi bi-twitter-x me-2"></i>X (Twitter)</a></li>
+                            <li><a class="dropdown-item share-option" href="#" data-share="facebook"><i class="bi bi-facebook me-2"></i>Facebook</a></li>
+                            <li><a class="dropdown-item share-option" href="#" data-share="instagram"><i class="bi bi-instagram me-2"></i>Instagram</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item share-option" href="#" data-share="copy"><i class="bi bi-link-45deg me-2"></i>Copy link</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Translate All Button -->
+                <button 
+                    class="btn-translate-all" 
+                    onclick="translateAll()"
+                    data-translated="false"
+                    title="Translate all content to English"
+                >
+                    <i class="bi bi-translate"></i>
+                    <span class="translate-text">Translate to English</span>
+                </button>
+            </div>
         </div>
         
         <% if(location.description) { %>
@@ -53,23 +97,16 @@
         
         <div class="show-meta">
             <%
-                // Get creation date - use ObjectId timestamp as fallback for old documents
-                var createdDate = location.createdAt || location._id.getTimestamp();
-                var updatedDate = location.updatedAt;
-                
-                // Check if the location was updated (updatedAt is significantly different from createdAt)
-                var wasUpdated = updatedDate && updatedDate.getTime() - createdDate.getTime() > 60000; // More than 1 minute difference
+                var createdDate = location.createdAt || (location._id && typeof location._id.getTimestamp === 'function' ? location._id.getTimestamp() : new Date());
+                if (createdDate && !(createdDate instanceof Date)) createdDate = new Date(createdDate);
+                var dateText = (function(d) {
+                    try { return (typeof moment !== 'undefined' && moment(d).isValid()) ? moment(d).fromNow() : (d ? d.toLocaleDateString() : ''); }
+                    catch (e) { return d ? d.toLocaleDateString() : ''; }
+                })(createdDate);
             %>
-            <% if(wasUpdated) { %>
-                <i class="bi bi-pencil me-1"></i>
-                Updated <%= moment(updatedDate).fromNow() %>
-                <span class="text-muted ms-2" style="font-size: 0.8rem;">
-                    (Created <%= moment(createdDate).fromNow() %>)
-                </span>
-            <% } else { %>
-                <i class="bi bi-clock me-1"></i>
-                Added <%= moment(createdDate).fromNow() %>
-            <% } %>
+            
+                Added <%= dateText %>
+            
         </div>
         
         <!-- Owner Actions -->
@@ -190,7 +227,7 @@
     }
 </style>
 
-<!-- Translation Script -->
+<!-- Translation & Share Script -->
 <script>
     const MAX_CHUNK_SIZE = 450; // MyMemory has 500 char limit, leave buffer
     
@@ -442,6 +479,108 @@
             commentEls.forEach(el => el.classList.remove('translating'));
         }
     }
+
+    // Like/unlike without page reload
+    (function initLikeButton() {
+        const btn = document.getElementById("like-btn");
+        if (!btn || btn.disabled) return;
+        const locationId = btn.dataset.locationId;
+        const iconEl = btn.querySelector(".like-icon");
+        const countEl = btn.querySelector(".like-count");
+
+        btn.addEventListener("click", async function () {
+            btn.disabled = true;
+            try {
+                const res = await fetch("/locations/" + locationId + "/like", {
+                    method: "POST",
+                    headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    credentials: "same-origin"
+                });
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    alert(data.error || "Could not update like");
+                    return;
+                }
+                const data = await res.json();
+                countEl.textContent = data.likes;
+                btn.dataset.liked = data.liked ? "true" : "false";
+                iconEl.className = "bi " + (data.liked ? "bi-heart-fill" : "bi-heart") + " like-icon";
+                iconEl.style.color = "#e63946";
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    })();
+
+    // Share menu: open the right app or copy link
+    (function initShareMenu() {
+        function getShareUrlAndText() {
+            const dropdown = document.querySelector(".share-dropdown");
+            if (!dropdown) return { url: "", name: "" };
+            const container = dropdown.closest(".dropdown");
+            const locationId = container && container.dataset.locationId;
+            const name = (container && container.dataset.locationName) || "BuenaVista location";
+            const url = locationId ? window.location.origin + "/locations/" + locationId : "";
+            const text = "Check out " + name + " on BuenaVista! " + url;
+            return { url, name, text };
+        }
+
+        async function copyToClipboard(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        document.querySelectorAll(".share-option").forEach(function (el) {
+            el.addEventListener("click", function (e) {
+                e.preventDefault();
+                const { url, name, text } = getShareUrlAndText();
+                if (!url) return;
+                const share = this.getAttribute("data-share");
+                const encodedUrl = encodeURIComponent(url);
+                const encodedText = encodeURIComponent(text);
+                const encodedName = encodeURIComponent(name);
+
+                switch (share) {
+                    case "gmail":
+                        window.open("https://mail.google.com/mail/?view=cm&fs=1&su=" + encodedName + "&body=" + encodedText, "_blank", "noopener,noreferrer");
+                        break;
+                    case "whatsapp":
+                        window.open("https://wa.me/?text=" + encodedText, "_blank", "noopener,noreferrer");
+                        break;
+                    case "twitter":
+                        window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent("Check out " + name + " on BuenaVista!") + "&url=" + encodedUrl, "_blank", "noopener,noreferrer");
+                        break;
+                    case "facebook":
+                        window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodedUrl, "_blank", "noopener,noreferrer");
+                        break;
+                    case "instagram": {
+                        copyToClipboard(url).then(function (ok) {
+                            if (ok) {
+                                window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+                                alert("Link copied! Open Instagram (or the tab we just opened), then paste the link in a story, post, or DM to share.");
+                            } else {
+                                prompt("Copy this link to share on Instagram:", url);
+                            }
+                        });
+                        break;
+                    }
+                    case "copy":
+                        copyToClipboard(url).then(function (ok) {
+                            alert(ok ? "Link copied! You can share it with other explorers." : "Copy this link: " + url);
+                        });
+                        break;
+                }
+            });
+        });
+    })();
 </script>
 
 <%- include("../partials/footer"); %>

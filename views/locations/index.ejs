@@ -44,7 +44,7 @@
         <div class="row g-4">
             <% locations.forEach(function(location) { %>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <article class="camp-card">
+                    <article class="camp-card" data-location-id="<%= location._id %>">
                         <div class="camp-card-image">
                             <img 
                                 src="<%= location.image %>" 
@@ -66,17 +66,23 @@
                                 <p class="camp-card-description text-muted">Discover this amazing destination...</p>
                             <% } %>
                             <div class="camp-card-footer">
-                                <% if(location.author && location.author.username) { %>
-                                    <span class="camp-card-author" title="<%= location.author.username %>">
-                                        <i class="bi bi-person-circle me-1"></i>
-                                        By <strong><%= location.author.username %></strong>
+                                <div class="d-flex flex-column">
+                                    <% if(location.author && location.author.username) { %>
+                                        <span class="camp-card-author" title="<%= location.author.username %>">
+                                            <i class="bi bi-person-circle me-1"></i>
+                                            By <strong><%= location.author.username %></strong>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="camp-card-author">
+                                            <i class="bi bi-person-circle me-1"></i>
+                                            Anonymous
+                                        </span>
+                                    <% } %>
+                                    <span class="text-muted location-likes-count" style="font-size: 0.8rem;">
+                                        <i class="bi bi-heart-fill me-1" style="color: #e63946;"></i>
+                                        <span class="likes-num"><%= typeof location.likes === "number" ? location.likes : 0 %></span> likes
                                     </span>
-                                <% } else { %>
-                                    <span class="camp-card-author">
-                                        <i class="bi bi-person-circle me-1"></i>
-                                        Anonymous
-                                    </span>
-                                <% } %>
+                                </div>
                                 <a href="/locations/<%= location._id %>" class="btn btn-camp-primary btn-sm">
                                     View <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
@@ -88,5 +94,25 @@
         </div>
     <% } %>
 </div>
+
+<script>
+    (function () {
+        function updateLikeCounts() {
+            fetch("/locations/api/likes", { credentials: "same-origin" })
+                .then(function (res) { return res.ok ? res.json() : Promise.reject(); })
+                .then(function (likes) {
+                    Object.keys(likes).forEach(function (id) {
+                        var el = document.querySelector('.camp-card[data-location-id="' + id + '"] .likes-num');
+                        if (el) el.textContent = likes[id];
+                    });
+                })
+                .catch(function () {});
+        }
+        updateLikeCounts();
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) updateLikeCounts();
+        });
+    })();
+</script>
 
 <%- include("../partials/footer"); %>
