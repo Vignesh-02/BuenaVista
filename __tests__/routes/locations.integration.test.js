@@ -78,14 +78,11 @@ describe("Locations routes (integration)", () => {
 
     describe("POST /locations", () => {
         it("redirects to /login when not authenticated", async () => {
-            const res = await request(app)
-                .post("/locations")
-                .type("form")
-                .send({
-                    name: "New Location",
-                    image: "https://example.com/img.jpg",
-                    description: "Description",
-                });
+            const res = await request(app).post("/locations").type("form").send({
+                name: "New Location",
+                image: "https://example.com/img.jpg",
+                description: "Description",
+            });
             expect(res.status).toBe(302);
             expect(res.headers.location).toMatch(/\/login/);
         });
@@ -98,14 +95,11 @@ describe("Locations routes (integration)", () => {
                 .send({ username, password: "password123" });
             const agent = request.agent(app);
             await agent.post("/login").type("form").send({ username, password: "password123" });
-            const res = await agent
-                .post("/locations")
-                .type("form")
-                .send({
-                    name: "Created Location",
-                    image: "https://example.com/created.jpg",
-                    description: "Created description",
-                });
+            const res = await agent.post("/locations").type("form").send({
+                name: "Created Location",
+                image: "https://example.com/created.jpg",
+                description: "Created description",
+            });
             expect(res.status).toBe(302);
             expect(res.headers.location).toBe("/locations");
             const found = await Location.findOne({ name: "Created Location" });
@@ -159,7 +153,10 @@ describe("Locations routes (integration)", () => {
         });
 
         it("redirects with error when non-owner tries to update (location unchanged)", async () => {
-            const owner = await User.register(new User({ username: `owner_${Date.now()}` }), "password123");
+            const owner = await User.register(
+                new User({ username: `owner_${Date.now()}` }),
+                "password123"
+            );
             const loc = await Location.create({
                 name: "Owned Location",
                 image: "https://example.com/img.jpg",
@@ -167,9 +164,15 @@ describe("Locations routes (integration)", () => {
                 author: { id: owner._id, username: owner.username },
             });
             const otherUser = `other_${Date.now()}`;
-            await request(app).post("/register").type("form").send({ username: otherUser, password: "password123" });
+            await request(app)
+                .post("/register")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username: otherUser, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const res = await agent
                 .put(`/locations/${loc._id}`)
                 .type("form")
@@ -214,7 +217,10 @@ describe("Locations routes (integration)", () => {
         });
 
         it("redirects back with error when non-owner tries to delete", async () => {
-            const owner = await User.register(new User({ username: `owner2_${Date.now()}` }), "password123");
+            const owner = await User.register(
+                new User({ username: `owner2_${Date.now()}` }),
+                "password123"
+            );
             const loc = await Location.create({
                 name: "Owned For Delete",
                 image: "https://example.com/img.jpg",
@@ -222,9 +228,15 @@ describe("Locations routes (integration)", () => {
                 author: { id: owner._id, username: owner.username },
             });
             const otherUser = `other2_${Date.now()}`;
-            await request(app).post("/register").type("form").send({ username: otherUser, password: "password123" });
+            await request(app)
+                .post("/register")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username: otherUser, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const res = await agent.delete(`/locations/${loc._id}`);
             expect(res.status).toBe(302);
             const stillThere = await Location.findById(loc._id);

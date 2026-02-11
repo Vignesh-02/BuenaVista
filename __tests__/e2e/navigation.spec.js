@@ -5,7 +5,9 @@ test.describe("Navigation", () => {
     test("locations page loads", async ({ page }) => {
         await page.goto("/locations", { waitUntil: "domcontentloaded" });
         await expect(page).toHaveURL(/\/locations/);
-        await expect(page.locator("body")).toContainText(/locations|Locations|Explore/i, { timeout: 10000 });
+        await expect(page.locator("body")).toContainText(/locations|Locations|Explore/i, {
+            timeout: 10000,
+        });
     });
 
     test("locations/new redirects to login when not authenticated", async ({ page }) => {
@@ -16,7 +18,10 @@ test.describe("Navigation", () => {
 
     test("register link from landing goes to register", async ({ page }) => {
         await page.goto("/", { waitUntil: "domcontentloaded" });
-        await page.locator("#landingNav").getByRole("link", { name: /Sign Up/i }).click();
+        await page
+            .locator("#landingNav")
+            .getByRole("link", { name: /Sign Up/i })
+            .click();
         await expect(page).toHaveURL(/\/register/);
     });
 

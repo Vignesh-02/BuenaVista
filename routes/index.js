@@ -52,23 +52,28 @@ router.get("/login", (req, res) => {
 });
 
 // Handle login logic
-router.post("/login", (req, res, next) => {
-    const loginValidation = validateLogin(req.body.username, req.body.password);
-    if (!loginValidation.valid) {
-        req.flash("error", loginValidation.message);
-        return res.redirect("/login");
+router.post(
+    "/login",
+    (req, res, next) => {
+        const loginValidation = validateLogin(req.body.username, req.body.password);
+        if (!loginValidation.valid) {
+            req.flash("error", loginValidation.message);
+            return res.redirect("/login");
+        }
+        next();
+    },
+    passport.authenticate("local", {
+        failureRedirect: "/login",
+        failureFlash: { type: "error", message: "Invalid username or password. Please try again." },
+    }),
+    (req, res, next) => {
+        req.flash("success", "Welcome back, " + req.user.username + "!");
+        req.session.save((err) => {
+            if (err) return next(err);
+            res.redirect("/locations");
+        });
     }
-    next();
-}, passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureFlash: { type: "error", message: "Invalid username or password. Please try again." }
-}), (req, res, next) => {
-    req.flash("success", "Welcome back, " + req.user.username + "!");
-    req.session.save((err) => {
-        if (err) return next(err);
-        res.redirect("/locations");
-    });
-});
+);
 
 // Logout route - destroy session in MongoStore and clear cookie
 router.get("/logout", (req, res, next) => {

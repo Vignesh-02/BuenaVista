@@ -122,11 +122,16 @@ describe("validateLogin", () => {
 describe("mapRegisterError", () => {
     it("returns friendly message for duplicate key (11000)", () => {
         const err = { code: 11000 };
-        expect(mapRegisterError(err)).toBe("That username is already taken. Please choose another.");
+        expect(mapRegisterError(err)).toBe(
+            "That username is already taken. Please choose another."
+        );
     });
 
     it("returns friendly message for ValidationError", () => {
-        const err = { name: "ValidationError", errors: { username: { message: "Username too short" } } };
+        const err = {
+            name: "ValidationError",
+            errors: { username: { message: "Username too short" } },
+        };
         expect(mapRegisterError(err)).toBe("Username too short");
     });
 
@@ -136,8 +141,12 @@ describe("mapRegisterError", () => {
     });
 
     it("returns friendly message for UserExistsError in message", () => {
-        const err = { message: "A user with the given username (UserExistsError) is already registered" };
-        expect(mapRegisterError(err)).toBe("That username is already taken. Please choose another.");
+        const err = {
+            message: "A user with the given username (UserExistsError) is already registered",
+        };
+        expect(mapRegisterError(err)).toBe(
+            "That username is already taken. Please choose another."
+        );
     });
 
     it("returns err.message for unknown errors", () => {

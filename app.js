@@ -55,7 +55,7 @@ app.use(
             maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
             sameSite: "lax",
         },
-    }),
+    })
 );
 
 // Passport configuration
@@ -70,7 +70,8 @@ passport.deserializeUser(User.deserializeUser());
 // Otherwise we'd mark new empty sessions as modified and save them to MongoDB.
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
-    const hasSessionData = req.session.passport || (req.session.flash && Object.keys(req.session.flash).length > 0);
+    const hasSessionData =
+        req.session.passport || (req.session.flash && Object.keys(req.session.flash).length > 0);
     if (hasSessionData) {
         res.locals.error = req.flash("error");
         res.locals.success = req.flash("success");
