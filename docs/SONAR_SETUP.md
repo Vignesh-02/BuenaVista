@@ -5,8 +5,8 @@ The CI workflow runs a **SonarCloud** scan after tests pass. To enable it:
 1. **Sign in**: Go to [sonarcloud.io](https://sonarcloud.io) and sign in with GitHub.
 
 2. **Add the project**: Choose **Analyze new project** → select this repo → pick **With GitHub Actions** when asked for analysis method. SonarCloud will show you:
-   - `sonar.organization` (e.g. your GitHub username or org)
-   - `sonar.projectKey` (e.g. `your-org_buenavista`)
+    - `sonar.organization` (e.g. your GitHub username or org)
+    - `sonar.projectKey` (e.g. `your-org_buenavista`)
 
 3. **Update `sonar-project.properties`** in the repo root: set `sonar.organization` and `sonar.projectKey` to the values from step 2.
 
