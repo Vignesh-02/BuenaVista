@@ -53,3 +53,18 @@ jobs:
                   NODE_ENV: test
                   SESSION_SECRET: test-secret-for-ci
                   CI: "true"
+
+    sonar:
+        name: SonarCloud
+        runs-on: ubuntu-latest
+        needs: [test]
+        if: secrets.SONAR_TOKEN != '' && (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false))
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarqube-scan-action@v7
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
