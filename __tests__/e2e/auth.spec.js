@@ -4,7 +4,9 @@ const { test, expect } = require("@playwright/test");
 test.describe("Auth flows", () => {
     test("register page shows Create Account form", async ({ page }) => {
         await page.goto("/register", { waitUntil: "domcontentloaded" });
-        await expect(page.getByRole("heading", { name: /Create Account/i })).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole("heading", { name: /Create Account/i })).toBeVisible({
+            timeout: 10000,
+        });
         await expect(page.getByLabel(/Username/i)).toBeVisible();
         await expect(page.getByLabel(/Password/i)).toBeVisible();
         await expect(page.getByRole("button", { name: /Create Account/i })).toBeVisible();
@@ -20,12 +22,16 @@ test.describe("Auth flows", () => {
         await page.getByRole("button", { name: /Create Account/i }).click();
 
         await expect(page).toHaveURL(/\/locations/);
-        await expect(page.getByText(new RegExp(`Welcome.*${username}`, "i"))).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText(new RegExp(`Welcome.*${username}`, "i"))).toBeVisible({
+            timeout: 10000,
+        });
     });
 
     test("login page shows Welcome Back and Sign In form", async ({ page }) => {
         await page.goto("/login", { waitUntil: "domcontentloaded" });
-        await expect(page.getByRole("heading", { name: /Welcome Back/i })).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole("heading", { name: /Welcome Back/i })).toBeVisible({
+            timeout: 10000,
+        });
         await expect(page.getByRole("button", { name: /Sign In/i })).toBeVisible();
     });
 
@@ -48,7 +54,9 @@ test.describe("Auth flows", () => {
         await page.getByRole("button", { name: /Sign In/i }).click();
 
         await expect(page).toHaveURL(/\/locations/);
-        await expect(page.getByText(new RegExp(`Welcome back.*${username}`, "i"))).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText(new RegExp(`Welcome back.*${username}`, "i"))).toBeVisible({
+            timeout: 10000,
+        });
     });
 
     test("invalid login shows error and stays on login", async ({ page }) => {

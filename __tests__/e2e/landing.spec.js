@@ -5,12 +5,16 @@ test.describe("Landing page", () => {
     test("loads and shows BuenaVista branding", async ({ page }) => {
         await page.goto("/", { waitUntil: "domcontentloaded" });
         await expect(page).toHaveTitle(/BuenaVista/i, { timeout: 10000 });
-        await expect(page.getByRole("link", { name: /BuenaVista/i }).first()).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole("link", { name: /BuenaVista/i }).first()).toBeVisible({
+            timeout: 10000,
+        });
     });
 
     test("hero has Explore and Join links", async ({ page }) => {
         await page.goto("/", { waitUntil: "domcontentloaded" });
-        await expect(page.getByRole("link", { name: /Explore Locations/i })).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole("link", { name: /Explore Locations/i })).toBeVisible({
+            timeout: 10000,
+        });
         await expect(page.getByRole("link", { name: /Join Free/i })).toBeVisible();
     });
 

@@ -21,7 +21,12 @@ async function main() {
     const appPath = path.join(__dirname, "..", "app.js");
     child = spawn(process.execPath, [appPath], {
         stdio: "inherit",
-        env: { ...process.env, NODE_ENV: "test", MONGODB_URL: uri, PORT: process.env.PORT || "5000" },
+        env: {
+            ...process.env,
+            NODE_ENV: "test",
+            MONGODB_URL: uri,
+            PORT: process.env.PORT || "5000",
+        },
         cwd: path.join(__dirname, ".."),
     });
 
@@ -36,7 +41,11 @@ async function main() {
 
     function shutdown() {
         if (child) child.kill("SIGTERM");
-        if (mongod) mongod.stop().then(() => process.exit(0)).catch(() => process.exit(1));
+        if (mongod)
+            mongod
+                .stop()
+                .then(() => process.exit(0))
+                .catch(() => process.exit(1));
         else process.exit(0);
     }
     process.on("SIGINT", shutdown);

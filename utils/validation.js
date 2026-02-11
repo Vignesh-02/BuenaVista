@@ -25,7 +25,9 @@ function validateRegister(username, password) {
             errors.push(`Username must be at most ${USERNAME_MAX} characters.`);
         }
         if (!USERNAME_REGEX.test(trimmedUsername)) {
-            errors.push("Username can only contain letters, numbers, and underscores (no spaces or special characters).");
+            errors.push(
+                "Username can only contain letters, numbers, and underscores (no spaces or special characters)."
+            );
         }
     }
 

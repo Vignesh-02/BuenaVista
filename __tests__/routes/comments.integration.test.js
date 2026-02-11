@@ -133,15 +133,24 @@ describe("Comments routes (integration)", () => {
         });
 
         it("does not update when non-owner tries to update", async () => {
-            const owner = await User.register(new User({ username: `comowner_${Date.now()}` }), "password123");
+            const owner = await User.register(
+                new User({ username: `comowner_${Date.now()}` }),
+                "password123"
+            );
             const comment = await Comment.create({
                 text: "Only owner can edit",
                 author: { id: owner._id, username: owner.username },
             });
             const otherUser = `comother_${Date.now()}`;
-            await request(app).post("/register").type("form").send({ username: otherUser, password: "password123" });
+            await request(app)
+                .post("/register")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username: otherUser, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const res = await agent
                 .put(`/locations/${testLocationId}/comments/${comment._id}`)
                 .type("form")
@@ -176,9 +185,7 @@ describe("Comments routes (integration)", () => {
             });
             const agent = request.agent(app);
             await agent.post("/login").type("form").send({ username, password: "password123" });
-            const res = await agent.delete(
-                `/locations/${testLocationId}/comments/${comment._id}`
-            );
+            const res = await agent.delete(`/locations/${testLocationId}/comments/${comment._id}`);
             expect(res.status).toBe(302);
             expect(res.headers.location).toBe(`/locations/${testLocationId}`);
             const gone = await Comment.findById(comment._id);
@@ -186,18 +193,25 @@ describe("Comments routes (integration)", () => {
         });
 
         it("does not delete when non-owner tries to delete", async () => {
-            const owner = await User.register(new User({ username: `delowner_${Date.now()}` }), "password123");
+            const owner = await User.register(
+                new User({ username: `delowner_${Date.now()}` }),
+                "password123"
+            );
             const comment = await Comment.create({
                 text: "Only owner can delete",
                 author: { id: owner._id, username: owner.username },
             });
             const otherUser = `delother_${Date.now()}`;
-            await request(app).post("/register").type("form").send({ username: otherUser, password: "password123" });
+            await request(app)
+                .post("/register")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username: otherUser, password: "password123" });
-            const res = await agent.delete(
-                `/locations/${testLocationId}/comments/${comment._id}`
-            );
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ username: otherUser, password: "password123" });
+            const res = await agent.delete(`/locations/${testLocationId}/comments/${comment._id}`);
             expect(res.status).toBe(302);
             const stillThere = await Comment.findById(comment._id);
             expect(stillThere).not.toBeNull();

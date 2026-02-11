@@ -28,16 +28,16 @@ router.post("/", middleware.isLoggedIn, async (req, res) => {
             req.flash("error", "Location not found");
             return res.redirect("/locations");
         }
-        
+
         const comment = await Comment.create(req.body.comment);
         // Add username and id to comment
         comment.author.id = req.user._id;
         comment.author.username = req.user.username;
         await comment.save();
-        
+
         location.comments.push(comment);
         await location.save();
-        
+
         req.flash("success", "Comment added successfully!");
         res.redirect("/locations/" + location._id);
     } catch (err) {

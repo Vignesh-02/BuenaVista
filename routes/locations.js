@@ -32,7 +32,7 @@ router.get("/api/likes", async (req, res) => {
     }
 });
 
-// CREATE - add new location to db 
+// CREATE - add new location to db
 router.post("/", middleware.isLoggedIn, async (req, res) => {
     try {
         const name = req.body.name;
@@ -40,10 +40,10 @@ router.post("/", middleware.isLoggedIn, async (req, res) => {
         const desc = req.body.description;
         const author = {
             id: req.user._id,
-            username: req.user.username
+            username: req.user.username,
         };
         const newLocation = { name, image, description: desc, author };
-        
+
         await Location.create(newLocation);
         req.flash("success", "Location created successfully!");
         res.redirect("/locations");
@@ -141,9 +141,12 @@ router.put("/:id", middleware.checkLocationOwnership, async (req, res) => {
         // Add updatedAt timestamp and use new:true to get updated doc
         const updateData = {
             ...req.body.group,
-            updatedAt: new Date()
+            updatedAt: new Date(),
         };
-        await Location.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
+        await Location.findByIdAndUpdate(req.params.id, updateData, {
+            new: true,
+            runValidators: true,
+        });
         req.flash("success", "Location updated successfully!");
         res.redirect("/locations/" + req.params.id);
     } catch (err) {
