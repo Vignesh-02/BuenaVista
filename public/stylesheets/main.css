@@ -912,3 +912,16 @@ img {
 [data-theme="dark"] .border-top {
   border-color: var(--card-border) !important;
 }
+
+/* Auth pages: headings and placeholders in dark mode */
+[data-theme="dark"] .page-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-custom .form-control::placeholder {
+  color: rgba(248, 249, 250, 0.85);
+}
+
+[data-theme="dark"] .form-custom .form-text {
+  color: var(--text-muted);
+}
