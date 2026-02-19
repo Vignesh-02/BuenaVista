@@ -8,6 +8,8 @@ module.exports = {
         "routes/**/*.js",
         "middleware/**/*.js",
         "models/**/*.js",
+        "app.js",
+        "db.js",
         "!**/node_modules/**",
     ],
     coverageDirectory: "coverage",
