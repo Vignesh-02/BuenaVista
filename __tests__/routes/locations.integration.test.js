@@ -125,7 +125,9 @@ describe("Locations routes (integration)", () => {
             });
             const agent = request.agent(app);
             await agent.post("/login").type("form").send({ username, password: "password123" });
-            const res = await agent.post(`/locations/${loc._id}/like`).set("Accept", "application/json");
+            const res = await agent
+                .post(`/locations/${loc._id}/like`)
+                .set("Accept", "application/json");
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("likes");
             expect(res.body).toHaveProperty("liked");
