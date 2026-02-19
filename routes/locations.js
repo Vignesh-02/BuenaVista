@@ -17,7 +17,12 @@ const upload = multer({
         if (ALLOWED_MIMES.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error("Only images are allowed (JPEG, PNG, GIF, WebP). Videos and other files are not allowed."), false);
+            cb(
+                new Error(
+                    "Only images are allowed (JPEG, PNG, GIF, WebP). Videos and other files are not allowed."
+                ),
+                false
+            );
         }
     },
 });
@@ -91,7 +96,11 @@ router.post(
             return res.json({ url });
         } catch (err) {
             console.error("ImageKit upload error:", err);
-            const is403 = err.status === 403 || (err.error && err.error.message && err.error.message.includes("cannot be authenticated"));
+            const is403 =
+                err.status === 403 ||
+                (err.error &&
+                    err.error.message &&
+                    err.error.message.includes("cannot be authenticated"));
             const message = is403
                 ? "ImageKit authentication failed. Check .env: IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, and IMAGEKIT_URL have no extra spaces or newlines, and match your ImageKit dashboard."
                 : "Image upload failed. Try again or use an image URL instead.";
@@ -122,7 +131,10 @@ router.post("/extract-image-from-link", middleware.isLoggedIn, async (req, res) 
     // Google Images "Copy link" - URL has imgurl param with the actual image. No fetch needed.
     try {
         const parsed = new URL(url);
-        if ((parsed.hostname === "www.google.com" || parsed.hostname === "google.com") && parsed.pathname.includes("/imgres")) {
+        if (
+            (parsed.hostname === "www.google.com" || parsed.hostname === "google.com") &&
+            parsed.pathname.includes("/imgres")
+        ) {
             const imgurl = parsed.searchParams.get("imgurl");
             if (imgurl && (imgurl.startsWith("http://") || imgurl.startsWith("https://"))) {
                 return res.json({ imageUrl: imgurl });
@@ -133,7 +145,8 @@ router.post("/extract-image-from-link", middleware.isLoggedIn, async (req, res) 
     }
 
     // Generic: fetch page and parse og:image / twitter:image
-    const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+    const BROWSER_UA =
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
@@ -143,7 +156,9 @@ router.post("/extract-image-from-link", middleware.isLoggedIn, async (req, res) 
         });
         clearTimeout(timeout);
         if (!response.ok) {
-            return res.status(400).json({ error: "Could not fetch the page. Check the link or try a direct image URL." });
+            return res.status(400).json({
+                error: "Could not fetch the page. Check the link or try a direct image URL.",
+            });
         }
         const html = await response.text();
         const $ = cheerio.load(html);
@@ -155,7 +170,9 @@ router.post("/extract-image-from-link", middleware.isLoggedIn, async (req, res) 
             imageUrl = "https:" + imageUrl;
         }
         if (!imageUrl || !imageUrl.startsWith("http")) {
-            return res.status(400).json({ error: "No image found on this page. Try pasting a direct image URL instead." });
+            return res.status(400).json({
+                error: "No image found on this page. Try pasting a direct image URL instead.",
+            });
         }
         return res.json({ imageUrl });
     } catch (err) {
@@ -163,7 +180,9 @@ router.post("/extract-image-from-link", middleware.isLoggedIn, async (req, res) 
             return res.status(400).json({ error: "Request timed out. Try a different link." });
         }
         console.error("Extract image error:", err);
-        return res.status(400).json({ error: "Could not fetch the page. Try a direct image URL instead." });
+        return res
+            .status(400)
+            .json({ error: "Could not fetch the page. Try a direct image URL instead." });
     }
 });
 
