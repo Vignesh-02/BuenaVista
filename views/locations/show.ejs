@@ -6,11 +6,12 @@
         <i class="bi bi-arrow-left me-2"></i>Back to All Locations
     </a>
     
-    <!-- Image Section -->
+    <!-- Image Section (standardized 640px display for sharpness; ImageKit gets tr:w-640, pasted URLs same container) -->
     <div class="show-image-container">
         <img 
-            src="<%= location.image %>" 
+            src="<%= typeof getDisplayImageUrl === 'function' ? getDisplayImageUrl(location.image, { size: 'show' }) : (location.image || '') %>" 
             alt="<%= location.name %>"
+            loading="eager"
             onerror="this.src='https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80'"
         >
     </div>
