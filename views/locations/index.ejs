@@ -47,7 +47,7 @@
                     <article class="camp-card" data-location-id="<%= location._id %>">
                         <div class="camp-card-image">
                             <img 
-                                src="<%= location.image %>" 
+                                src="<%= typeof getDisplayImageUrl === 'function' ? getDisplayImageUrl(location.image, { size: 'thumb' }) : (location.image || '') %>" 
                                 alt="<%= location.name %>"
                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                 loading="lazy"
