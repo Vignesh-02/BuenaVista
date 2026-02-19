@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const campgroundSchema = new mongoose.Schema(
+const locationSchema = new mongoose.Schema(
     {
         name: String,
         price: String,
@@ -37,4 +37,4 @@ const campgroundSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("Campground", campgroundSchema);
+module.exports = mongoose.model("Location", locationSchema);
