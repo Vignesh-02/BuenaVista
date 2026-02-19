@@ -34,6 +34,29 @@ describe("Locations routes (integration)", () => {
         });
     });
 
+    describe("GET /locations/api/likes", () => {
+        it("returns 200 and JSON with location id to likes mapping", async () => {
+            const res = await request(app).get("/locations/api/likes");
+            expect(res.status).toBe(200);
+            expect(res.headers["content-type"]).toMatch(/json/);
+            expect(res.body).toBeDefined();
+            expect(typeof res.body).toBe("object");
+        });
+
+        it("includes like counts for existing locations", async () => {
+            const loc = await Location.create({
+                name: "Liked Location",
+                image: "https://example.com/img.jpg",
+                description: "Desc",
+                author: { id: new mongoose.Types.ObjectId(), username: "u" },
+                likes: 5,
+            });
+            const res = await request(app).get("/locations/api/likes");
+            expect(res.status).toBe(200);
+            expect(res.body[loc._id.toString()]).toBe(5);
+        });
+    });
+
     describe("GET /locations/new", () => {
         it("redirects to /login when not authenticated", async () => {
             const res = await request(app).get("/locations/new");
@@ -73,6 +96,39 @@ describe("Locations routes (integration)", () => {
             const res = await request(app).get(`/locations/${loc._id}`);
             expect(res.status).toBe(200);
             expect(res.text).toMatch(/Test Location|Test description/i);
+        });
+    });
+
+    describe("POST /locations/:id/like", () => {
+        it("returns 401 JSON when not authenticated (Accept: json)", async () => {
+            const loc = await Location.create({
+                name: "Like Test",
+                image: "https://example.com/img.jpg",
+                description: "Desc",
+                author: { id: new mongoose.Types.ObjectId(), username: "u" },
+            });
+            const res = await request(app)
+                .post(`/locations/${loc._id}/like`)
+                .set("Accept", "application/json");
+            expect(res.status).toBe(401);
+            expect(res.body.error).toMatch(/login/i);
+        });
+
+        it("returns 200 JSON with likes count when authenticated (toggle like)", async () => {
+            const username = `likeuser_${Date.now()}`;
+            const user = await User.register(new User({ username }), "password123");
+            const loc = await Location.create({
+                name: "To Like",
+                image: "https://example.com/img.jpg",
+                description: "Desc",
+                author: { id: new mongoose.Types.ObjectId(), username: "other" },
+            });
+            const agent = request.agent(app);
+            await agent.post("/login").type("form").send({ username, password: "password123" });
+            const res = await agent.post(`/locations/${loc._id}/like`).set("Accept", "application/json");
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("likes");
+            expect(res.body).toHaveProperty("liked");
         });
     });
 
