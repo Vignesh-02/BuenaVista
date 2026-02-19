@@ -66,18 +66,18 @@ res.render() or res.redirect() or res.json()
 - **Entry point** when run directly; requires `db.js` and starts the server.
 - **Exports `{ app }`** for tests (supertest).
 - **Configuration**:
-  - `express.urlencoded` + `express.json` for request bodies
-  - `trust proxy: true` in production (for correct `req.protocol` behind HTTPS)
-  - EJS as view engine
-  - Static files from `/public`
-  - Method override for `_method` (PUT, DELETE via POST)
+    - `express.urlencoded` + `express.json` for request bodies
+    - `trust proxy: true` in production (for correct `req.protocol` behind HTTPS)
+    - EJS as view engine
+    - Static files from `/public`
+    - Method override for `_method` (PUT, DELETE via POST)
 - **Session**: MongoStore with 14-day TTL, secure cookies in production.
 - **Passport**: Local strategy using `User.authenticate()` from passport-local-mongoose.
 - **Globals for templates**:
-  - `res.locals.currentUser` — logged-in user or undefined
-  - `res.locals.error`, `res.locals.success` — flash messages
-  - `app.locals.moment` — date formatting
-  - `app.locals.getDisplayImageUrl` — ImageKit display URL helper
+    - `res.locals.currentUser` — logged-in user or undefined
+    - `res.locals.error`, `res.locals.success` — flash messages
+    - `app.locals.moment` — date formatting
+    - `app.locals.getDisplayImageUrl` — ImageKit display URL helper
 
 ### `db.js`
 
@@ -110,42 +110,42 @@ res.render() or res.redirect() or res.json()
 
 ### Index (`routes/index.js`)
 
-| Method | Path        | Purpose                    | Auth  |
-|--------|-------------|----------------------------|-------|
-| GET    | /           | Landing page               | No    |
-| GET    | /register   | Registration form         | No    |
-| POST   | /register   | Create user, log in        | No    |
-| GET    | /login      | Login form                 | No    |
-| POST   | /login      | Authenticate               | No    |
-| GET    | /logout     | Log out, destroy session   | Yes   |
+| Method | Path      | Purpose                  | Auth |
+| ------ | --------- | ------------------------ | ---- |
+| GET    | /         | Landing page             | No   |
+| GET    | /register | Registration form        | No   |
+| POST   | /register | Create user, log in      | No   |
+| GET    | /login    | Login form               | No   |
+| POST   | /login    | Authenticate             | No   |
+| GET    | /logout   | Log out, destroy session | Yes  |
 
 ### Locations (`routes/locations.js`)
 
-| Method | Path                        | Purpose                         | Auth  |
-|--------|-----------------------------|---------------------------------|-------|
-| GET    | /locations                  | List all locations              | No    |
-| GET    | /locations/api/likes        | JSON like counts for index      | No    |
-| POST   | /locations                  | Create location                 | Yes   |
-| POST   | /locations/upload-image     | Upload image to ImageKit (JSON) | Yes   |
-| POST   | /locations/extract-image-from-link | Extract og:image from URL | Yes   |
-| GET    | /locations/new             | New location form               | Yes   |
-| GET    | /locations/:id             | Show location + comments       | No    |
-| POST   | /locations/:id/like         | Toggle like (HTML or JSON)      | Yes   |
-| GET    | /locations/:id/edit        | Edit form (owner only)          | Yes   |
-| PUT    | /locations/:id             | Update (owner only)             | Yes   |
-| DELETE | /locations/:id             | Delete (owner only)             | Yes   |
+| Method | Path                               | Purpose                         | Auth |
+| ------ | ---------------------------------- | ------------------------------- | ---- |
+| GET    | /locations                         | List all locations              | No   |
+| GET    | /locations/api/likes               | JSON like counts for index      | No   |
+| POST   | /locations                         | Create location                 | Yes  |
+| POST   | /locations/upload-image            | Upload image to ImageKit (JSON) | Yes  |
+| POST   | /locations/extract-image-from-link | Extract og:image from URL       | Yes  |
+| GET    | /locations/new                     | New location form               | Yes  |
+| GET    | /locations/:id                     | Show location + comments        | No   |
+| POST   | /locations/:id/like                | Toggle like (HTML or JSON)      | Yes  |
+| GET    | /locations/:id/edit                | Edit form (owner only)          | Yes  |
+| PUT    | /locations/:id                     | Update (owner only)             | Yes  |
+| DELETE | /locations/:id                     | Delete (owner only)             | Yes  |
 
 ### Comments (`routes/comments.js`)
 
 Mounted at `/locations/:id/comments`.
 
-| Method | Path                              | Purpose                    | Auth  |
-|--------|-----------------------------------|----------------------------|-------|
-| GET    | /locations/:id/comments/new      | New comment form           | Yes   |
-| POST   | /locations/:id/comments          | Create comment             | Yes   |
-| GET    | /locations/:id/comments/:comment_id/edit | Edit form          | Owner |
-| PUT    | /locations/:id/comments/:comment_id      | Update comment     | Owner |
-| DELETE | /locations/:id/comments/:comment_id     | Delete comment     | Owner |
+| Method | Path                                     | Purpose          | Auth  |
+| ------ | ---------------------------------------- | ---------------- | ----- |
+| GET    | /locations/:id/comments/new              | New comment form | Yes   |
+| POST   | /locations/:id/comments                  | Create comment   | Yes   |
+| GET    | /locations/:id/comments/:comment_id/edit | Edit form        | Owner |
+| PUT    | /locations/:id/comments/:comment_id      | Update comment   | Owner |
+| DELETE | /locations/:id/comments/:comment_id      | Delete comment   | Owner |
 
 ---
 
@@ -185,8 +185,8 @@ Mounted at `/locations/:id/comments`.
 
 - **Body**: `{ url: "https://..." }`.
 - **Handles**:
-  - Google Images: `imgurl` query param.
-  - Other sites: Fetch HTML, parse `og:image` / `twitter:image` via Cheerio.
+    - Google Images: `imgurl` query param.
+    - Other sites: Fetch HTML, parse `og:image` / `twitter:image` via Cheerio.
 - **Response**: `{ imageUrl: "https://..." }` or `{ error: "..." }`.
 
 ### `GET /locations/api/likes`
@@ -202,17 +202,17 @@ Mounted at `/locations/:id/comments`.
 
 ## Environment Variables
 
-| Variable                 | Purpose                          |
-|--------------------------|----------------------------------|
-| MONGODB_URL              | MongoDB connection string        |
-| SESSION_SECRET           | Session signing (required in prod) |
-| IMAGEKIT_PRIVATE_KEY     | ImageKit server API key          |
-| IMAGEKIT_PUBLIC_KEY      | ImageKit public key              |
-| IMAGEKIT_URL             | ImageKit URL endpoint            |
-| IMAGEKIT_USE_WEB_PROXY   | Optional web proxy for external URLs |
-| PORT                     | Server port (default 5004)       |
-| NODE_ENV                 | `development` \| `production` \| `test` |
-| USE_HTTPS                | Set to `false` if behind non-HTTPS proxy |
+| Variable               | Purpose                                  |
+| ---------------------- | ---------------------------------------- |
+| MONGODB_URL            | MongoDB connection string                |
+| SESSION_SECRET         | Session signing (required in prod)       |
+| IMAGEKIT_PRIVATE_KEY   | ImageKit server API key                  |
+| IMAGEKIT_PUBLIC_KEY    | ImageKit public key                      |
+| IMAGEKIT_URL           | ImageKit URL endpoint                    |
+| IMAGEKIT_USE_WEB_PROXY | Optional web proxy for external URLs     |
+| PORT                   | Server port (default 5004)               |
+| NODE_ENV               | `development` \| `production` \| `test`  |
+| USE_HTTPS              | Set to `false` if behind non-HTTPS proxy |
 
 ---
 

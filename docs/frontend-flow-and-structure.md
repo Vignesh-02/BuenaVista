@@ -7,6 +7,7 @@ This document describes the client-side architecture, views, templates, and inte
 ## Overview
 
 BuenaVista uses **server-side rendering** with **EJS** templates. The frontend is a mix of:
+
 - **Static HTML** rendered by the server
 - **Bootstrap 5** for layout and components
 - **Bootstrap Icons** for UI icons
@@ -66,23 +67,23 @@ Most pages use a shared layout:
 
 These are set by Express middleware or route handlers:
 
-| Variable      | Type   | Description                    |
-|---------------|--------|--------------------------------|
-| `currentUser` | User?  | Logged-in user or undefined    |
-| `error`      | Array  | Flash error messages           |
-| `success`    | Array  | Flash success messages         |
-| `moment`     | Function | Date formatting (app.locals) |
+| Variable      | Type     | Description                  |
+| ------------- | -------- | ---------------------------- |
+| `currentUser` | User?    | Logged-in user or undefined  |
+| `error`       | Array    | Flash error messages         |
+| `success`     | Array    | Flash success messages       |
+| `moment`      | Function | Date formatting (app.locals) |
 
 ### Page-Specific Data
 
-| View             | Data Passed              |
-|------------------|--------------------------|
-| locations/index  | `locations`              |
-| locations/new    | —                        |
-| locations/edit   | `location`               |
-| locations/show   | `location` (with populated comments) |
-| comments/new     | `location`               |
-| comments/edit    | `location`, `comment`, `location_id` |
+| View            | Data Passed                          |
+| --------------- | ------------------------------------ |
+| locations/index | `locations`                          |
+| locations/new   | —                                    |
+| locations/edit  | `location`                           |
+| locations/show  | `location` (with populated comments) |
+| comments/new    | `location`                           |
+| comments/edit   | `location`, `comment`, `location_id` |
 
 ---
 
@@ -92,9 +93,9 @@ These are set by Express middleware or route handlers:
 
 - **Bootstrap 5** provides grid, utilities, and components.
 - **Custom CSS** in `main.css` and `landing.css`:
-  - CSS variables for colors, backgrounds, borders
-  - `.btn-camp-primary`, `.btn-camp-secondary`, etc.
-  - Theme classes for light/dark via `data-theme`
+    - CSS variables for colors, backgrounds, borders
+    - `.btn-camp-primary`, `.btn-camp-secondary`, etc.
+    - Theme classes for light/dark via `data-theme`
 
 ### Theme Toggle
 
@@ -110,6 +111,7 @@ These are set by Express middleware or route handlers:
 ### 1. Image Upload (new.ejs, edit.ejs)
 
 **Flow:**
+
 1. User clicks "Upload image" → hidden file input opens.
 2. User selects file → client validates type (JPEG/PNG/GIF/WebP) and size (max 5 MB).
 3. `FormData` with `image` file sent to `POST /locations/upload-image`.
@@ -119,6 +121,7 @@ These are set by Express middleware or route handlers:
 ### 2. Extract Image from Link (new.ejs, edit.ejs)
 
 **Flow:**
+
 1. User pastes URL in "Or paste a link" input.
 2. User clicks "Use link" button.
 3. `POST /locations/extract-image-from-link` with `{ url }` (JSON).
@@ -131,6 +134,7 @@ These are set by Express middleware or route handlers:
 ### 3. Like Button (show.ejs)
 
 **Flow:**
+
 1. User clicks like button.
 2. `POST /locations/:id/like` with `Accept: application/json`, `credentials: "same-origin"`.
 3. Response `{ likes, liked }` → update count and heart icon.
@@ -139,12 +143,14 @@ These are set by Express middleware or route handlers:
 ### 4. Like Counts on Index (index.ejs)
 
 **Flow:**
+
 1. On load (and on `pageshow` for back-forward cache): `GET /locations/api/likes`.
 2. Response `{ "<id>": count, ... }` → update each card’s `.likes-num`.
 
 ### 5. Share Menu (show.ejs)
 
 **Flow:**
+
 1. User clicks share option (Gmail, WhatsApp, Twitter, Facebook, Instagram, Copy link).
 2. Each option opens a share URL or copies link to clipboard.
 3. Uses `data-location-id` and `data-location-name` from the card for URL and text.
@@ -216,13 +222,13 @@ If no image URL: placeholder image or icon (e.g. picsum or inline SVG) can be us
 
 ## Dependencies (Frontend)
 
-| Source           | Purpose                    |
-|------------------|----------------------------|
-| Bootstrap 5 (CDN)| Layout, components, utilities |
-| Bootstrap Icons (CDN) | Icons              |
-| Google Fonts     | Outfit, Playfair Display   |
-| Custom CSS       | Theme variables, overrides|
-| Vanilla JS       | No frontend framework      |
+| Source                | Purpose                       |
+| --------------------- | ----------------------------- |
+| Bootstrap 5 (CDN)     | Layout, components, utilities |
+| Bootstrap Icons (CDN) | Icons                         |
+| Google Fonts          | Outfit, Playfair Display      |
+| Custom CSS            | Theme variables, overrides    |
+| Vanilla JS            | No frontend framework         |
 
 ---
 
