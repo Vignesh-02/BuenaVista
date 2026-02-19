@@ -6,13 +6,13 @@ Documentation for the BuenaVista travel/location sharing application.
 
 ## Contents
 
-| Document | Description |
-|----------|-------------|
-| [**Backend Flow and Structure**](./backend-flow-and-structure.md) | Server architecture, request flow, routes, models, middleware, ImageKit, and API endpoints |
-| [**Frontend Flow and Structure**](./frontend-flow-and-structure.md) | Views, templates, client-side JavaScript, styling, theming, and form flows |
-| [**API Reference**](./api.md) | Detailed route documentation with request/response formats |
-| [**Models and Relations**](./models-and-relations.md) | Database schemas and relationships |
-| [**Setup**](./setup.md) | Installation, environment variables, and development setup |
+| Document                                                            | Description                                                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [**Backend Flow and Structure**](./backend-flow-and-structure.md)   | Server architecture, request flow, routes, models, middleware, ImageKit, and API endpoints |
+| [**Frontend Flow and Structure**](./frontend-flow-and-structure.md) | Views, templates, client-side JavaScript, styling, theming, and form flows                 |
+| [**API Reference**](./api.md)                                       | Detailed route documentation with request/response formats                                 |
+| [**Models and Relations**](./models-and-relations.md)               | Database schemas and relationships                                                         |
+| [**Setup**](./setup.md)                                             | Installation, environment variables, and development setup                                 |
 
 ---
 
