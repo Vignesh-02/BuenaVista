@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === "production") {
 
 // App configuration
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.set("view engine", "ejs");
 // Serve static files BEFORE session so /public requests don't create new sessions
 app.use(express.static(__dirname + "/public"));
@@ -32,6 +33,9 @@ app.use(flash());
 
 // Make moment available in all templates
 app.locals.moment = require("moment-timezone");
+// Image display helper: sharp, properly sized ImageKit URLs; pass-through for external URLs
+const { getDisplayImageUrl } = require("./lib/imagekit");
+app.locals.getDisplayImageUrl = getDisplayImageUrl;
 
 // Session configuration (MongoStore for production; avoids MemoryStore warning)
 const isProduction = process.env.NODE_ENV === "production";
