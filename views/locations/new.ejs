@@ -33,17 +33,41 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="image" class="form-label">
-                            <i class="bi bi-image me-1"></i>Image URL
+                        <label class="form-label">
+                            <i class="bi bi-image me-1"></i>Location photo
                         </label>
-                        <input 
-                            type="url" 
-                            class="form-control" 
-                            id="image" 
-                            name="image" 
-                            placeholder="https://fastly.picsum.photos/id/800/800/600.jpg?hmac=cQ32r42G1MP10zyp5U8s3_iVSds2aaqRMVTI-xUmttQ"
-                        >
-                        <div class="form-text">Enter a valid image URL or leave blank for placeholder</div>
+                        <input type="hidden" name="image" id="imageUrl" value="">
+                        <!-- Preview -->
+                        <div id="imagePreviewWrap" class="rounded border mb-3 p-2 text-center" style="min-height: 120px; background: var(--bg-tertiary); display: none;">
+                            <img id="imagePreview" src="" alt="Preview" class="img-fluid rounded" style="max-height: 220px; object-fit: contain;">
+                        </div>
+                        <div id="imagePreviewPlaceholder" class="rounded border mb-3 p-4 text-center text-muted" style="min-height: 120px; background: var(--bg-tertiary);">
+                            <i class="bi bi-image display-4 d-block mb-2"></i>
+                            <span>Upload an image or paste a URL below</span>
+                        </div>
+                        <!-- Upload button -->
+                        <div class="mb-2">
+                            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/gif,image/webp" class="d-none">
+                            <button type="button" id="uploadImageBtn" class="btn btn-outline-primary">
+                                <i class="bi bi-cloud-arrow-up me-2"></i>Upload image
+                            </button>
+                            <span class="text-muted ms-2 small">(max 5 MB, JPEG/PNG/GIF/WebP only)</span>
+                        </div>
+                        <div class="mb-2">
+                            <label for="imageUrlFallback" class="form-label small text-muted mb-0">Or paste a link</label>
+                            <div class="input-group input-group-sm">
+                                <input type="url" class="form-control" id="imageUrlFallback" placeholder="Paste image address (Google Images) or page link (Pinterest, etc.)">
+                                <button type="button" id="fetchFromLinkBtn" class="btn btn-outline-secondary" title="Get image from link">
+                                    <i class="bi bi-link-45deg"></i> Use link
+                                </button>
+                            </div>
+                            <div class="form-text small">
+                                <strong>What to do:</strong> Paste your link above, then click "Use link" (for page links). Direct image URLs: just paste.<br>
+                                <strong>Google Images:</strong> Right-click the image → <strong>Copy image address</strong> (not "Copy link") → paste. No button needed.<br>
+                                <strong>Pinterest:</strong> Copy the pin link → paste → Use link.<br>
+                                <strong>Other direct image URLs:</strong> Just paste; no button needed.
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="mb-4">
@@ -75,5 +99,104 @@
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    const MAX_SIZE = 5 * 1024 * 1024;
+    const imageUrl = document.getElementById("imageUrl");
+    const imagePreview = document.getElementById("imagePreview");
+    const imagePreviewWrap = document.getElementById("imagePreviewWrap");
+    const imagePreviewPlaceholder = document.getElementById("imagePreviewPlaceholder");
+    const imageFile = document.getElementById("imageFile");
+    const uploadImageBtn = document.getElementById("uploadImageBtn");
+    const imageUrlFallback = document.getElementById("imageUrlFallback");
+
+    function setImageUrl(url) {
+        url = (url || "").trim();
+        imageUrl.value = url;
+        if (url) {
+            imagePreviewPlaceholder.style.display = "none";
+            imagePreviewWrap.style.display = "block";
+            imagePreview.src = url;
+            imagePreview.onerror = function() { imagePreview.style.display = "none"; };
+            imagePreview.style.display = "";
+        } else {
+            imagePreviewPlaceholder.style.display = "block";
+            imagePreviewWrap.style.display = "none";
+            imagePreview.src = "";
+        }
+    }
+
+    uploadImageBtn.addEventListener("click", function() { imageFile.click(); });
+
+    imageFile.addEventListener("change", function() {
+        var file = this.files[0];
+        if (!file) return;
+        if (!file.type.match(/^image\/(jpeg|png|gif|webp)$/i)) {
+            alert("Please choose an image file (JPEG, PNG, GIF, or WebP). Videos and other files are not allowed.");
+            return;
+        }
+        if (file.size > MAX_SIZE) {
+            alert("Image is too large. Maximum size is 5 MB.");
+            return;
+        }
+        var btn = uploadImageBtn;
+        btn.disabled = true;
+        btn.innerHTML = "<span class=\"spinner-border spinner-border-sm me-2\"></span>Uploading...";
+        var fd = new FormData();
+        fd.append("image", file);
+        fetch("/locations/upload-image", { method: "POST", body: fd, credentials: "same-origin" })
+            .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(result) {
+                if (result.ok && result.data.url) {
+                    setImageUrl(result.data.url);
+                    imageUrlFallback.value = "";
+                } else {
+                    alert(result.data.error || "Upload failed.");
+                }
+            })
+            .catch(function() { alert("Upload failed. Try again or use an image URL instead."); })
+            .finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = "<i class=\"bi bi-cloud-arrow-up me-2\"></i>Upload image";
+                imageFile.value = "";
+            });
+    });
+
+    imageUrlFallback.addEventListener("input", function() { setImageUrl(this.value); });
+    imageUrlFallback.addEventListener("change", function() { setImageUrl(this.value); });
+
+    document.getElementById("fetchFromLinkBtn").addEventListener("click", function() {
+        var link = imageUrlFallback.value.trim();
+        if (!link) {
+            alert("Please paste a link first (e.g. from Google Images or any image site).");
+            return;
+        }
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = "<span class=\"spinner-border spinner-border-sm\"></span>";
+        fetch("/locations/extract-image-from-link", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: link }),
+            credentials: "same-origin"
+        })
+            .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(result) {
+                if (result.ok && result.data.imageUrl) {
+                    setImageUrl(result.data.imageUrl);
+                    imageUrlFallback.value = result.data.imageUrl;
+                } else {
+                    alert(result.data.error || "Could not extract image from link.");
+                }
+            })
+            .catch(function() { alert("Could not get image from link. Try pasting a direct image URL."); })
+            .finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = "<i class=\"bi bi-link-45deg\"></i> Use link";
+            });
+    });
+})();
+</script>
 
 <%- include("../partials/footer"); %>
