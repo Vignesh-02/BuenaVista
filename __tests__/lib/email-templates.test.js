@@ -1,4 +1,8 @@
-const { getOnboardingHtml } = require("../../lib/email-templates");
+const {
+    getOnboardingHtml,
+    getLocationCreatedHtml,
+    getCommentNotificationHtml,
+} = require("../../lib/email-templates");
 
 describe("email-templates", () => {
     describe("getOnboardingHtml", () => {
@@ -34,6 +38,50 @@ describe("email-templates", () => {
             const html = getOnboardingHtml("User");
             expect(html).toContain("/locations");
             expect(html).toMatch(/buenavista\.in|href=.*locations/);
+        });
+    });
+
+    describe("getLocationCreatedHtml", () => {
+        it("returns HTML with username, location name, and view URL", () => {
+            const html = getLocationCreatedHtml(
+                "Alice",
+                "Sunset Beach",
+                "https://app.example.com/locations/123"
+            );
+            expect(html).toContain("Hey Alice, your post is live.");
+            expect(html).toContain("Sunset Beach");
+            expect(html).toContain("https://app.example.com/locations/123");
+            expect(html).toMatch(/YOUR POST IS LIVE|BuenaVista/i);
+        });
+
+        it("escapes location name to prevent XSS", () => {
+            const html = getLocationCreatedHtml("U", "<script>alert(1)</script>", "https://x.com");
+            expect(html).not.toContain("<script>");
+        });
+    });
+
+    describe("getCommentNotificationHtml", () => {
+        it("returns HTML with recipient, commenter, comment text, and view URL", () => {
+            const html = getCommentNotificationHtml(
+                "Author",
+                "My Post",
+                "Commenter",
+                "Great view!",
+                "https://app.example.com/locations/456"
+            );
+            expect(html).toContain("Author");
+            expect(html).toContain("My Post");
+            expect(html).toContain("Commenter");
+            expect(html).toContain("Great view!");
+            expect(html).toContain("https://app.example.com/locations/456");
+            expect(html).toMatch(/YOUR COMMUNITY IS ENGAGING|BuenaVista/i);
+        });
+
+        it("escapes comment text and uses defaults for missing values", () => {
+            const html = getCommentNotificationHtml(null, null, null, "Say <hi>", "https://u.com");
+            expect(html).toContain("there");
+            expect(html).not.toContain("<hi>");
+            expect(html).toMatch(/Someone|said/i);
         });
     });
 });

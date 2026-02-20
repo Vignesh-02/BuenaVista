@@ -12,45 +12,52 @@ const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 128;
 const USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
 
+function getUsernameRegisterErrors(trimmed) {
+    const errs = [];
+    if (!trimmed) {
+        errs.push("Username is required.");
+        return errs;
+    }
+    if (trimmed.length < USERNAME_MIN)
+        errs.push(`Username must be at least ${USERNAME_MIN} characters.`);
+    if (trimmed.length > USERNAME_MAX)
+        errs.push(`Username must be at most ${USERNAME_MAX} characters.`);
+    if (!USERNAME_REGEX.test(trimmed)) {
+        errs.push(
+            "Username can only contain letters, numbers, and underscores (no spaces or special characters)."
+        );
+    }
+    return errs;
+}
+
+function getEmailRegisterErrors(trimmed) {
+    if (!trimmed) return ["Email is required."];
+    if (!validator.isEmail(trimmed)) return ["Please enter a valid email address."];
+    return [];
+}
+
+function getPasswordRegisterErrors(trimmed) {
+    const errs = [];
+    if (!trimmed) {
+        errs.push("Password is required.");
+        return errs;
+    }
+    if (trimmed.length < PASSWORD_MIN)
+        errs.push(`Password must be at least ${PASSWORD_MIN} characters.`);
+    if (trimmed.length > PASSWORD_MAX)
+        errs.push(`Password must be at most ${PASSWORD_MAX} characters.`);
+    return errs;
+}
+
 function validateRegister(username, email, password) {
-    const errors = [];
     const trimmedUsername = (username || "").trim();
     const trimmedEmail = (email || "").trim().toLowerCase();
     const trimmedPassword = (password || "").trim();
-
-    if (!trimmedUsername) {
-        errors.push("Username is required.");
-    } else {
-        if (trimmedUsername.length < USERNAME_MIN) {
-            errors.push(`Username must be at least ${USERNAME_MIN} characters.`);
-        }
-        if (trimmedUsername.length > USERNAME_MAX) {
-            errors.push(`Username must be at most ${USERNAME_MAX} characters.`);
-        }
-        if (!USERNAME_REGEX.test(trimmedUsername)) {
-            errors.push(
-                "Username can only contain letters, numbers, and underscores (no spaces or special characters)."
-            );
-        }
-    }
-
-    if (!trimmedEmail) {
-        errors.push("Email is required.");
-    } else if (!validator.isEmail(trimmedEmail)) {
-        errors.push("Please enter a valid email address.");
-    }
-
-    if (!trimmedPassword) {
-        errors.push("Password is required.");
-    } else {
-        if (trimmedPassword.length < PASSWORD_MIN) {
-            errors.push(`Password must be at least ${PASSWORD_MIN} characters.`);
-        }
-        if (trimmedPassword.length > PASSWORD_MAX) {
-            errors.push(`Password must be at most ${PASSWORD_MAX} characters.`);
-        }
-    }
-
+    const errors = [
+        ...getUsernameRegisterErrors(trimmedUsername),
+        ...getEmailRegisterErrors(trimmedEmail),
+        ...getPasswordRegisterErrors(trimmedPassword),
+    ];
     return {
         valid: errors.length === 0,
         errors,

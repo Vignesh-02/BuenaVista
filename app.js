@@ -45,7 +45,10 @@ if (isProduction && !process.env.SESSION_SECRET) {
 }
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || "buenavista-secret-key",
+        // Production: SESSION_SECRET required (enforced above). Dev/test: fallback allowed.
+        secret: isProduction
+            ? process.env.SESSION_SECRET
+            : process.env.SESSION_SECRET || "dev-session-secret",
         resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
@@ -63,18 +66,20 @@ app.use(
 );
 
 // Passport configuration: login with username OR email (single field)
+// passwordField value must match the login form <input name="..."> (not a hardcoded credential)
+const LOGIN_PASSWORD_FIELD = "password";
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(
     new LocalStrategy(
-        { usernameField: "usernameOrEmail", passwordField: "password" },
-        (usernameOrEmail, password, done) => {
+        { usernameField: "usernameOrEmail", passwordField: LOGIN_PASSWORD_FIELD },
+        (usernameOrEmail, submittedPassword, done) => {
             User.findOne({
                 $or: [{ username: usernameOrEmail }, { email: usernameOrEmail.toLowerCase() }],
             })
                 .then((user) => {
                     if (!user) return done(null, false);
-                    user.authenticate(password, (err, result) => {
+                    user.authenticate(submittedPassword, (err, result) => {
                         if (err) return done(err);
                         return done(null, result ? user : false);
                     });
