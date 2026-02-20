@@ -5,13 +5,15 @@
 const multer = require("multer");
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const ALLOWED_MIMES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+// we are using a Set to avoid duplicate MIME types and it does hash lookups in constant time
+const ALLOWED_MIMES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
 
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_IMAGE_SIZE },
     fileFilter: (req, file, cb) => {
-        if (ALLOWED_MIMES.includes(file.mimetype)) {
+        if (ALLOWED_MIMES.has(file.mimetype)) {
             cb(null, true);
         } else {
             cb(
@@ -31,7 +33,7 @@ function handleUploadError(err, req, res, next) {
     if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({ error: "Image is too large. Maximum size is 5 MB." });
     }
-    if (err.message && err.message.includes("Only images are allowed")) {
+    if (err.message?.includes("Only images are allowed")) {
         return res.status(400).json({ error: err.message });
     }
     next(err);
