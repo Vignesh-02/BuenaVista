@@ -90,7 +90,11 @@ describe("lib/imagekit", () => {
             process.env.IMAGEKIT_PRIVATE_KEY = "p";
             process.env.IMAGEKIT_PUBLIC_KEY = "k";
             process.env.IMAGEKIT_URL = "https://ik.imagekit.io/x";
-            const result = await uploadLocationImage(Buffer.from("data"), "photo.jpg", "image/jpeg");
+            const result = await uploadLocationImage(
+                Buffer.from("data"),
+                "photo.jpg",
+                "image/jpeg"
+            );
             expect(result).toEqual({ url: "https://ik.imagekit.io/test/img.jpg" });
             expect(ImageKit).toHaveBeenCalled();
             const instance = ImageKit.mock.results[0].value;
