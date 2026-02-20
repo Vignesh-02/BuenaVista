@@ -4,6 +4,8 @@ module.exports = {
     testMatch: ["**/__tests__/**/*.test.js"],
     setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
     collectCoverageFrom: [
+        "controllers/**/*.js",
+        "lib/**/*.js",
         "utils/**/*.js",
         "routes/**/*.js",
         "middleware/**/*.js",
