@@ -91,7 +91,7 @@ passport.use(
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Middleware to pass currentUser and flash messages to all templates.
+// Middleware passes currentUser and flash messages to all templates.
 // Only read flash (which modifies the session) when the session has user or flash data.
 // Otherwise we'd mark new empty sessions as modified and save them to MongoDB.
 app.use((req, res, next) => {
