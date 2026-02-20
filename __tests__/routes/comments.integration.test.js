@@ -46,9 +46,9 @@ describe("Comments routes (integration)", () => {
             await request(app)
                 .post("/register")
                 .type("form")
-                .send({ username, password: "password123" });
+                .send({ username, email: `${username}@test.com`, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username, password: "password123" });
+            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
             const res = await agent.get(`/locations/${testLocationId}/comments/new`);
             expect(res.status).toBe(200);
             expect(res.text).toMatch(/comment|Add|form/i);
@@ -70,9 +70,9 @@ describe("Comments routes (integration)", () => {
             await request(app)
                 .post("/register")
                 .type("form")
-                .send({ username, password: "password123" });
+                .send({ username, email: `${username}@test.com`, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username, password: "password123" });
+            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
             const res = await agent
                 .post(`/locations/${testLocationId}/comments`)
                 .type("form")
@@ -121,7 +121,7 @@ describe("Comments routes (integration)", () => {
                 author: { id: user._id, username: user.username },
             });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username, password: "password123" });
+            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
             const res = await agent
                 .put(`/locations/${testLocationId}/comments/${comment._id}`)
                 .type("form")
@@ -145,12 +145,12 @@ describe("Comments routes (integration)", () => {
             await request(app)
                 .post("/register")
                 .type("form")
-                .send({ username: otherUser, password: "password123" });
+                .send({ username: otherUser, email: `${otherUser}@test.com`, password: "password123" });
             const agent = request.agent(app);
             await agent
                 .post("/login")
                 .type("form")
-                .send({ username: otherUser, password: "password123" });
+                .send({ usernameOrEmail: otherUser, password: "password123" });
             const res = await agent
                 .put(`/locations/${testLocationId}/comments/${comment._id}`)
                 .type("form")
@@ -184,7 +184,7 @@ describe("Comments routes (integration)", () => {
                 author: { id: user._id, username: user.username },
             });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ username, password: "password123" });
+            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
             const res = await agent.delete(`/locations/${testLocationId}/comments/${comment._id}`);
             expect(res.status).toBe(302);
             expect(res.headers.location).toBe(`/locations/${testLocationId}`);
@@ -205,12 +205,12 @@ describe("Comments routes (integration)", () => {
             await request(app)
                 .post("/register")
                 .type("form")
-                .send({ username: otherUser, password: "password123" });
+                .send({ username: otherUser, email: `${otherUser}@test.com`, password: "password123" });
             const agent = request.agent(app);
             await agent
                 .post("/login")
                 .type("form")
-                .send({ username: otherUser, password: "password123" });
+                .send({ usernameOrEmail: otherUser, password: "password123" });
             const res = await agent.delete(`/locations/${testLocationId}/comments/${comment._id}`);
             expect(res.status).toBe(302);
             const stillThere = await Comment.findById(comment._id);

@@ -62,10 +62,27 @@ app.use(
     })
 );
 
-// Passport configuration
+// Passport configuration: login with username OR email (single field)
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
+passport.use(
+    new LocalStrategy(
+        { usernameField: "usernameOrEmail", passwordField: "password" },
+        (usernameOrEmail, password, done) => {
+            User.findOne({
+                $or: [{ username: usernameOrEmail }, { email: usernameOrEmail.toLowerCase() }],
+            })
+                .then((user) => {
+                    if (!user) return done(null, false);
+                    user.authenticate(password, (err, result) => {
+                        if (err) return done(err);
+                        return done(null, result ? user : false);
+                    });
+                })
+                .catch(done);
+        }
+    )
+);
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
