@@ -23,7 +23,11 @@ router.post(
 );
 
 // Extract image URL from a page link (Google Images imgurl, og:image, etc.)
-router.post("/extract-image-from-link", middleware.isLoggedIn, locationsController.extractImageFromLink);
+router.post(
+    "/extract-image-from-link",
+    middleware.isLoggedIn,
+    locationsController.extractImageFromLink
+);
 
 // NEW - display form to create new location
 router.get("/new", middleware.isLoggedIn, (req, res) => {

@@ -13,7 +13,8 @@ middlewareObj.checkLocationOwnership = async (req, res, next) => {
                 return res.redirect("back");
             }
             // Does user own the location? (author may be { id, username } or legacy ObjectId)
-            const authorId = foundLocation.author && (foundLocation.author.id || foundLocation.author);
+            const authorId =
+                foundLocation.author && (foundLocation.author.id || foundLocation.author);
             if (authorId && authorId.equals(req.user._id)) {
                 next();
             } else {
