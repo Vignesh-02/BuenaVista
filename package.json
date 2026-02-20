@@ -34,7 +34,9 @@
         "passport": "^0.7.0",
         "passport-local": "^1.0.0",
         "passport-local-mongoose": "^8.0.0",
-        "sharp": "^0.34.5"
+        "resend": "^4.8.0",
+        "sharp": "^0.34.5",
+        "validator": "^13.15.26"
     },
     "devDependencies": {
         "@playwright/test": "^1.49.0",

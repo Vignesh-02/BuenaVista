@@ -232,49 +232,81 @@ body {
   background-repeat: no-repeat;
   opacity: 0;
   z-index: 0;
-  animation: imageAnimation 50s linear infinite; 
+  animation: imageAnimation 100s linear infinite; 
 }
+
+/* 
+  ANIMATION TIMING: 10 images × 10s each = 100s total cycle
+  Adjust your @keyframes imageAnimation duration to 100s
+*/
 
 .slideshow li:nth-child(1) { 
-  background-image: url(https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80);
-}
-
-.slideshow li:nth-child(2) { 
-  background-image: url(https://images.unsplash.com/photo-1517824806704-9040b037703b?w=1920&q=80);
-  animation-delay: 10s; 
-}
-
-.slideshow li:nth-child(3) { 
-  background-image: url(https://images.unsplash.com/photo-1476041800959-2f6bb412c8ce?w=1920&q=80);
-  animation-delay: 20s; 
-}
-
-.slideshow li:nth-child(4) { 
-  background-image: url(https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=1920&q=80);
-  animation-delay: 30s; 
-}
-
-.slideshow li:nth-child(5) { 
-  background-image: url(https://images.unsplash.com/photo-1534880606858-29b0e8a24e8d?w=1920&q=80);
-  animation-delay: 40s; 
-}
-
-@keyframes imageAnimation { 
-  0% { 
-    opacity: 0; 
-    animation-timing-function: ease-in;
+    background-image: url(https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1920&q=80);
+    /* Hallstatt, Austria – dreamy lakeside village */
   }
-  10% {
-    opacity: 1;
-    animation-timing-function: ease-out;
+  
+  .slideshow li:nth-child(2) { 
+    background-image: url(https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80);
+    animation-delay: 10s;
+    /* Northern Lights, Iceland */
   }
-  20% {
-    opacity: 1;
+  
+  .slideshow li:nth-child(3) { 
+    background-image: url(https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1920&q=80);
+    animation-delay: 20s;
+    /* Taj Mahal, India */
   }
-  30% {
-    opacity: 0;
+  
+  .slideshow li:nth-child(4) { 
+    background-image: url(https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1920&q=80);
+    animation-delay: 30s;
+    /* Santorini, Greece */
   }
-}
+  
+  .slideshow li:nth-child(5) { 
+    background-image: url(https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1920&q=80);
+    animation-delay: 40s;
+    /* Machu Picchu, Peru */
+  }
+  
+  .slideshow li:nth-child(6) { 
+    background-image: url(https://images.unsplash.com/photo-1528164344705-47542687000d?w=1920&q=80);
+    animation-delay: 50s;
+    /* Chureito Pagoda & Mount Fuji, Japan */
+  }
+  
+  .slideshow li:nth-child(7) { 
+    background-image: url(https://images.unsplash.com/photo-1621414050946-1b936a78491f?w=1920&q=80);
+    animation-delay: 60s;
+    /* Mount Kilimanjaro, Tanzania */
+  }
+  
+  .slideshow li:nth-child(8) { 
+    background-image: url(https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=1920&q=80);
+    animation-delay: 70s;
+    /* Great Wall of China */
+  }
+  
+  .slideshow li:nth-child(9) { 
+    background-image: url(https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1920&q=80);
+    animation-delay: 80s;
+    /* Bali Rice Terraces, Indonesia */
+  }
+  
+  .slideshow li:nth-child(10) { 
+    background-image: url(https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1920&q=80);
+    animation-delay: 90s;
+    /* Milford Sound, New Zealand */
+  }
+
+  @keyframes imageAnimation {
+    0% { opacity: 0; animation-timing-function: ease-in; }
+    2% { opacity: 1; animation-timing-function: ease-out; }
+    10% { opacity: 1; }
+    12% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  
 
 /* ============================================
    Landing Footer

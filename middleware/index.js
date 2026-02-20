@@ -12,8 +12,10 @@ middlewareObj.checkLocationOwnership = async (req, res, next) => {
                 req.flash("error", "Location not found");
                 return res.redirect("back");
             }
-            // Does user own the location?
-            if (foundLocation.author.id.equals(req.user._id)) {
+            // Does user own the location? (author may be { id, username } or legacy ObjectId)
+            const authorId =
+                foundLocation.author && (foundLocation.author.id || foundLocation.author);
+            if (authorId?.equals(req.user._id)) {
                 next();
             } else {
                 req.flash("error", "You don't have permission to do that");
@@ -38,8 +40,9 @@ middlewareObj.checkCommentOwnership = async (req, res, next) => {
                 req.flash("error", "Comment not found");
                 return res.redirect("back");
             }
-            // Does user own the comment?
-            if (foundComment.author.id.equals(req.user._id)) {
+            // Does user own the comment? (author may be { id, username } or legacy ObjectId)
+            const authorId = foundComment.author && (foundComment.author.id || foundComment.author);
+            if (authorId?.equals(req.user._id)) {
                 next();
             } else {
                 req.flash("error", "You don't have permission to do that");
