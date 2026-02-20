@@ -8,7 +8,7 @@ test.describe("Auth flows", () => {
             timeout: 10000,
         });
         await expect(page.getByLabel(/Username/i)).toBeVisible();
-        await expect(page.getByLabel(/Email/i)).toBeVisible();
+        await expect(page.getByRole("textbox", { name: /Email/i })).toBeVisible();
         await expect(page.getByLabel(/Password/i)).toBeVisible();
         await expect(page.getByRole("button", { name: /Create Account/i })).toBeVisible();
     });
@@ -20,7 +20,7 @@ test.describe("Auth flows", () => {
 
         await page.goto("/register", { waitUntil: "domcontentloaded" });
         await page.getByLabel(/Username/i).fill(username);
-        await page.getByLabel(/Email/i).fill(email);
+        await page.getByRole("textbox", { name: /Email/i }).fill(email);
         await page.getByLabel(/Password/i).fill(password);
         await page.getByRole("button", { name: /Create Account/i }).click();
 
@@ -45,7 +45,7 @@ test.describe("Auth flows", () => {
 
         await page.goto("/register", { waitUntil: "domcontentloaded" });
         await page.getByLabel(/Username/i).fill(username);
-        await page.getByLabel(/Email/i).fill(email);
+        await page.getByRole("textbox", { name: /Email/i }).fill(email);
         await page.getByLabel(/Password/i).fill(password);
         await page.getByRole("button", { name: /Create Account/i }).click();
         await expect(page).toHaveURL(/\/locations/);
