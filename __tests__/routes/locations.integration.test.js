@@ -71,7 +71,10 @@ describe("Locations routes (integration)", () => {
                 .type("form")
                 .send({ username, email: `${username}@test.com`, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ usernameOrEmail: username, password: "password123" });
             const res = await agent.get("/locations/new");
             expect(res.status).toBe(200);
             expect(res.text).toMatch(/Add|New|location|form/i);
@@ -116,7 +119,7 @@ describe("Locations routes (integration)", () => {
 
         it("returns 200 JSON with likes count when authenticated (toggle like)", async () => {
             const username = `likeuser_${Date.now()}`;
-            const user = await User.register(new User({ username }), "password123");
+            await User.register(new User({ username }), "password123");
             const loc = await Location.create({
                 name: "To Like",
                 image: "https://example.com/img.jpg",
@@ -124,7 +127,10 @@ describe("Locations routes (integration)", () => {
                 author: { id: new mongoose.Types.ObjectId(), username: "other" },
             });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ usernameOrEmail: username, password: "password123" });
             const res = await agent
                 .post(`/locations/${loc._id}/like`)
                 .set("Accept", "application/json");
@@ -152,7 +158,10 @@ describe("Locations routes (integration)", () => {
                 .type("form")
                 .send({ username, email: `${username}@test.com`, password: "password123" });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ usernameOrEmail: username, password: "password123" });
             const res = await agent.post("/locations").type("form").send({
                 name: "Created Location",
                 image: "https://example.com/created.jpg",
@@ -192,7 +201,10 @@ describe("Locations routes (integration)", () => {
                 author: { id: user._id, username: user.username },
             });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ usernameOrEmail: username, password: "password123" });
             const res = await agent
                 .put(`/locations/${loc._id}`)
                 .type("form")
@@ -225,7 +237,11 @@ describe("Locations routes (integration)", () => {
             await request(app)
                 .post("/register")
                 .type("form")
-                .send({ username: otherUser, email: `${otherUser}@test.com`, password: "password123" });
+                .send({
+                    username: otherUser,
+                    email: `${otherUser}@test.com`,
+                    password: "password123",
+                });
             const agent = request.agent(app);
             await agent
                 .post("/login")
@@ -266,7 +282,10 @@ describe("Locations routes (integration)", () => {
                 author: { id: user._id, username: user.username },
             });
             const agent = request.agent(app);
-            await agent.post("/login").type("form").send({ usernameOrEmail: username, password: "password123" });
+            await agent
+                .post("/login")
+                .type("form")
+                .send({ usernameOrEmail: username, password: "password123" });
             const res = await agent.delete(`/locations/${loc._id}`);
             expect(res.status).toBe(302);
             expect(res.headers.location).toBe("/locations");
@@ -289,7 +308,11 @@ describe("Locations routes (integration)", () => {
             await request(app)
                 .post("/register")
                 .type("form")
-                .send({ username: otherUser, email: `${otherUser}@test.com`, password: "password123" });
+                .send({
+                    username: otherUser,
+                    email: `${otherUser}@test.com`,
+                    password: "password123",
+                });
             const agent = request.agent(app);
             await agent
                 .post("/login")

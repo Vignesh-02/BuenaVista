@@ -10,7 +10,11 @@ router.get("/new", middleware.isLoggedIn, commentsController.newCommentForm);
 router.post("/", middleware.isLoggedIn, commentsController.createComment);
 
 // EDIT - show edit form (after ownership check)
-router.get("/:comment_id/edit", middleware.checkCommentOwnership, commentsController.editCommentForm);
+router.get(
+    "/:comment_id/edit",
+    middleware.checkCommentOwnership,
+    commentsController.editCommentForm
+);
 
 // UPDATE
 router.put("/:comment_id", middleware.checkCommentOwnership, commentsController.updateComment);

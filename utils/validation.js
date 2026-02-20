@@ -81,10 +81,7 @@ function mapRegisterError(err) {
             : "That username is already taken. Please choose another.";
     }
     if (err.name === "ValidationError") {
-        const msg =
-            err.errors?.username?.message ||
-            err.errors?.email?.message ||
-            err.message;
+        const msg = err.errors?.username?.message || err.errors?.email?.message || err.message;
         return msg;
     }
     if (err.message && err.message.includes("UserExistsError")) {

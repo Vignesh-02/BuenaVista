@@ -71,10 +71,11 @@ describe("Auth routes (integration)", () => {
         });
 
         it("redirects to /register with error when username has special characters", async () => {
-            const res = await request(app)
-                .post("/register")
-                .type("form")
-                .send({ username: "user@name", email: "test@example.com", password: "password123" });
+            const res = await request(app).post("/register").type("form").send({
+                username: "user@name",
+                email: "test@example.com",
+                password: "password123",
+            });
             expect(res.status).toBe(302);
             expect(res.headers.location).toBe("/register");
         });
