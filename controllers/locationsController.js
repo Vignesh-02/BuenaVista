@@ -11,7 +11,8 @@ function isUrlAllowedForFetch(urlString) {
     try {
         const parsed = new URL(urlString);
         const hostname = (parsed.hostname || "").toLowerCase();
-        if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") return false;
+        if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1")
+            return false;
         const parts = hostname.replace(/^\[|\]$/g, "").split(".");
         const a = parseInt(parts[0], 10) || 0;
         const b = parseInt(parts[1], 10) || 0;
@@ -129,9 +130,7 @@ async function uploadImage(req, res) {
         return res.json({ url });
     } catch (err) {
         console.error("ImageKit upload error:", err);
-        const is403 =
-            err.status === 403 ||
-            err.error?.message?.includes("cannot be authenticated");
+        const is403 = err.status === 403 || err.error?.message?.includes("cannot be authenticated");
         const message = is403
             ? "ImageKit authentication failed. Check .env: IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, and IMAGEKIT_URL have no extra spaces or newlines, and match your ImageKit dashboard."
             : "Image upload failed. Try again or use an image URL instead.";
