@@ -14,17 +14,18 @@
                 
                 <form action="/login" method="POST">
                     <div class="mb-3">
-                        <label for="username" class="form-label">
-                            <i class="bi bi-person me-1"></i>Username
+                        <label for="usernameOrEmail" class="form-label">
+                            <i class="bi bi-person me-1"></i>Username or email
                         </label>
                         <input 
                             type="text" 
                             class="form-control form-control-lg" 
-                            id="username" 
-                            name="username" 
-                            placeholder="Enter your username"
+                            id="usernameOrEmail" 
+                            name="usernameOrEmail" 
+                            placeholder="Enter your username or email"
                             required
                             autofocus
+                            autocomplete="username"
                         >
                     </div>
                     
