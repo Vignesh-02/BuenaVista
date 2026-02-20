@@ -35,7 +35,8 @@ async function createComment(req, res) {
             return res.redirect("/locations");
         }
 
-        const comment = await Comment.create(req.body.comment);
+        const text = (req.body.comment && req.body.comment.text) || "";
+        const comment = await Comment.create({ text });
         comment.author.id = req.user._id;
         comment.author.username = req.user.username;
         await comment.save();
@@ -91,7 +92,8 @@ async function editCommentForm(req, res) {
  */
 async function updateComment(req, res) {
     try {
-        await Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment);
+        const text = (req.body.comment && req.body.comment.text) || "";
+        await Comment.findByIdAndUpdate(req.params.comment_id, { text });
         req.flash("success", "Comment updated successfully!");
         res.redirect("/locations/" + req.params.id);
     } catch (err) {

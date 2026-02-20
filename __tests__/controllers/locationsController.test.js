@@ -120,6 +120,19 @@ describe("locationsController", () => {
             });
         });
 
+        it("returns 400 for disallowed host (localhost) and does not call fetch", async () => {
+            const fetchSpy = jest.spyOn(global, "fetch");
+            const req = mockReq({ body: { url: "http://localhost/page" } });
+            const res = mockRes();
+            await locationsController.extractImageFromLink(req, res);
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({
+                error: "This link is not allowed. Use a public web page or direct image URL.",
+            });
+            expect(fetchSpy).not.toHaveBeenCalled();
+            fetchSpy.mockRestore();
+        });
+
         it("returns imageUrl for Google Images imgres link", async () => {
             const req = mockReq({
                 body: {
