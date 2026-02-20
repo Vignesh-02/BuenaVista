@@ -6,7 +6,6 @@ jest.mock("../../models/location");
 jest.mock("../../lib/imagekit");
 jest.mock("../../lib/email");
 
-const Location = require("../../models/location");
 const { uploadLocationImage } = require("../../lib/imagekit");
 const locationsController = require("../../controllers/locationsController");
 
@@ -56,7 +55,11 @@ describe("locationsController", () => {
         it("returns 200 and url when upload succeeds", async () => {
             uploadLocationImage.mockResolvedValue({ url: "https://ik.imagekit.io/abc/photo.jpg" });
             const req = mockReq({
-                file: { buffer: Buffer.from("x"), originalname: "photo.jpg", mimetype: "image/jpeg" },
+                file: {
+                    buffer: Buffer.from("x"),
+                    originalname: "photo.jpg",
+                    mimetype: "image/jpeg",
+                },
             });
             const res = mockRes();
             await locationsController.uploadImage(req, res);
