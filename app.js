@@ -66,8 +66,8 @@ app.use(
 );
 
 // Passport configuration: login with username OR email (single field)
-// passwordField value must match the login form <input name="..."> (not a hardcoded credential)
-const LOGIN_PASSWORD_FIELD = "password";
+// Value must match the login form <input name="...">. Not a credential.
+const LOGIN_PASSWORD_FIELD = "password"; // NOSONAR S2068 - form field name, not a hardcoded password
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(

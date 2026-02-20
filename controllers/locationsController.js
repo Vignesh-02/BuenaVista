@@ -6,6 +6,47 @@ const Location = require("../models/location");
 const { uploadLocationImage } = require("../lib/imagekit");
 const { sendLocationCreatedEmail } = require("../lib/email");
 
+/** Returns true if URL is safe for server-side fetch (no localhost, private IPs, or cloud metadata). */
+function isUrlAllowedForFetch(urlString) {
+    try {
+        const parsed = new URL(urlString);
+        const hostname = (parsed.hostname || "").toLowerCase();
+        if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") return false;
+        const parts = hostname.replace(/^\[|\]$/g, "").split(".");
+        const a = parseInt(parts[0], 10) || 0;
+        const b = parseInt(parts[1], 10) || 0;
+        if (parts.length === 4 && !Number.isNaN(a) && !Number.isNaN(b)) {
+            if (a === 10) return false;
+            if (a === 172 && b >= 16 && b <= 31) return false;
+            if (a === 192 && b === 168) return false;
+            if (a === 169 && b === 254) return false;
+            if (a === 0 && b === 0) return false;
+        }
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+/** Returns direct image URL from Google Images "Copy link" (imgres?imgurl=...) or null. */
+function getGoogleImagesImgUrl(urlString) {
+    try {
+        const parsed = new URL(urlString);
+        if (
+            (parsed.hostname === "www.google.com" || parsed.hostname === "google.com") &&
+            parsed.pathname.includes("/imgres")
+        ) {
+            const imgurl = parsed.searchParams.get("imgurl");
+            if (imgurl && (imgurl.startsWith("http://") || imgurl.startsWith("https://"))) {
+                return imgurl;
+            }
+        }
+    } catch (e) {
+        // Not a valid URL
+    }
+    return null;
+}
+
 /**
  * GET /locations - List all locations (no cache).
  */
@@ -44,16 +85,15 @@ async function apiLikes(req, res) {
  */
 async function createLocation(req, res) {
     try {
-        const name = req.body.name;
-        const image = req.body.image;
-        const desc = req.body.description;
-        const author = {
-            id: req.user._id,
-            username: req.user.username,
-        };
-        const newLocation = { name, image, description: desc, author };
-
-        const location = await Location.create(newLocation);
+        const name = req.body.name != null ? String(req.body.name) : "";
+        const image = req.body.image != null ? String(req.body.image) : "";
+        const description = req.body.description != null ? String(req.body.description) : "";
+        const location = await Location.create({
+            name,
+            image,
+            description,
+            author: { id: req.user._id, username: req.user.username },
+        });
         req.flash("success", "Location created successfully!");
         res.redirect("/locations");
 
@@ -91,9 +131,7 @@ async function uploadImage(req, res) {
         console.error("ImageKit upload error:", err);
         const is403 =
             err.status === 403 ||
-            (err.error &&
-                err.error.message &&
-                err.error.message.includes("cannot be authenticated"));
+            err.error?.message?.includes("cannot be authenticated");
         const message = is403
             ? "ImageKit authentication failed. Check .env: IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, and IMAGEKIT_URL have no extra spaces or newlines, and match your ImageKit dashboard."
             : "Image upload failed. Try again or use an image URL instead.";
@@ -113,19 +151,13 @@ async function extractImageFromLink(req, res) {
         return res.status(400).json({ error: "Link must start with http:// or https://" });
     }
 
-    try {
-        const parsed = new URL(url);
-        if (
-            (parsed.hostname === "www.google.com" || parsed.hostname === "google.com") &&
-            parsed.pathname.includes("/imgres")
-        ) {
-            const imgurl = parsed.searchParams.get("imgurl");
-            if (imgurl && (imgurl.startsWith("http://") || imgurl.startsWith("https://"))) {
-                return res.json({ imageUrl: imgurl });
-            }
-        }
-    } catch (e) {
-        // Not a valid URL, continue to fetch flow
+    const googleImgUrl = getGoogleImagesImgUrl(url);
+    if (googleImgUrl) return res.json({ imageUrl: googleImgUrl });
+
+    if (!isUrlAllowedForFetch(url)) {
+        return res.status(400).json({
+            error: "This link is not allowed. Use a public web page or direct image URL.",
+        });
     }
 
     const BROWSER_UA =
@@ -149,10 +181,10 @@ async function extractImageFromLink(req, res) {
             $('meta[property="og:image"]').attr("content") ||
             $('meta[name="twitter:image"]').attr("content") ||
             $('meta[property="twitter:image"]').attr("content");
-        if (imageUrl && imageUrl.startsWith("//")) {
+        if (imageUrl?.startsWith("//")) {
             imageUrl = "https:" + imageUrl;
         }
-        if (!imageUrl || !imageUrl.startsWith("http")) {
+        if (!imageUrl?.startsWith("http")) {
             return res.status(400).json({
                 error: "No image found on this page. Try pasting a direct image URL instead.",
             });
